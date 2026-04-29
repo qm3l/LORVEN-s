@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>اتصل بنا - LORVEN</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <style>
+        :root {
+            --bg: #F8F4F0;
+            --surface: #FFFFFF;
+            --text: #243048;
+            --text-soft: #8F8A88;
+            --text-light: #B0A8A0;
+            --border: #E0D6D0;
+            --accent: #e8919e;
+            --gold: #c8a84e;
+            --gradient: linear-gradient(135deg, #243048, #3A4A66);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'IBM Plex Sans Arabic', 'Segoe UI', sans-serif;
+            background: var(--gradient);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 380px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: var(--surface);
+            border-radius: 24px;
+            padding: 20px 24px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 16px;
+            position: relative;
+        }
+        
+        .back-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.25s;
+        }
+        
+        .back-btn:hover {
+            background: var(--text);
+            color: white;
+        }
+        
+        .header h2 {
+            font-size: 20px;
+            font-weight: 800;
+            margin-top: 8px;
+        }
+        
+        .header .icon-circle {
+            width: 50px;
+            height: 50px;
+            background: var(--bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 22px;
+            color: var(--accent);
+        }
+        
+        .contact-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        
+        .contact-card {
+            background: var(--surface);
+            border-radius: 18px;
+            padding: 18px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .contact-card:hover {
+            transform: translateX(-4px);
+            box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+        }
+        
+        .contact-card:active {
+            transform: scale(0.98);
+        }
+        
+        .contact-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .icon-wa { background: #25D366; color: white; }
+        .icon-email { background: #EA4335; color: white; }
+        .icon-ig { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: white; }
+        .icon-tt { background: #000000; color: white; }
+        .icon-web { background: var(--text); color: white; }
+        
+        .contact-info h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+        
+        .contact-info p {
+            font-size: 10px;
+            color: var(--text-soft);
+        }
+        
+        .form-card {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+            margin-bottom: 14px;
+        }
+        
+        .form-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .form-card h3 i {
+            color: var(--accent);
+        }
+        
+        .form-group {
+            margin-bottom: 12px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid var(--border);
+            border-radius: 14px;
+            font-family: inherit;
+            font-size: 12px;
+            color: var(--text);
+            background: var(--bg);
+            outline: none;
+            transition: all 0.3s;
+            resize: vertical;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(232,145,158,0.1);
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--text);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .submit-btn:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(232,145,158,0.3);
+        }
+        
+        .submit-btn:active {
+            transform: scale(0.97);
+        }
+        
+        .info-box {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 16px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 14px;
+        }
+        
+        .info-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 0;
+            font-size: 11px;
+            color: var(--text-soft);
+        }
+        
+        .info-row i {
+            width: 20px;
+            color: var(--accent);
+            text-align: center;
+        }
+        
+        .footer {
+            text-align: center;
+            padding-bottom: 20px;
+        }
+        
+        .footer p {
+            font-size: 10px;
+            color: rgba(255,255,255,0.4);
+            margin: 2px 0;
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            background: #e8f5e9;
+            border-radius: 16px;
+            margin-bottom: 14px;
+            color: #2e7d32;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .success-message i {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="javascript:history.back()" class="back-btn"><i class="fas fa-arrow-right"></i></a>
+            <div class="icon-circle"><i class="fas fa-headset"></i></div>
+            <h2>اتصل بنا</h2>
+            <p style="font-size: 11px; color: #8F8A88; margin-top: 4px;">نحن هنا لمساعدتك في أي وقت</p>
+        </div>
+        
+        <!-- طرق التواصل -->
+        <div class="contact-methods">
+            <a href="https://wa.me/967778051888" target="_blank" class="contact-card">
+                <div class="contact-icon icon-wa"><i class="fab fa-whatsapp"></i></div>
+                <div class="contact-info">
+                    <h4>واتساب</h4>
+                    <p>+967 778051888</p>
+                    <p style="font-size: 9px; color: #4caf50;">متاح 24/7 • رد سريع</p>
+                </div>
+                <i class="fas fa-chevron-left" style="margin-right: auto; color: var(--text-light);"></i>
+            </a>
+            
+            <a href="mailto:support@lorvenye.com" class="contact-card">
+                <div class="contact-icon icon-email"><i class="fas fa-envelope"></i></div>
+                <div class="contact-info">
+                    <h4>البريد الإلكتروني</h4>
+                    <p>support@lorvenye.com</p>
+                    <p style="font-size: 9px; color: #EA4335;">رد خلال 24 ساعة</p>
+                </div>
+                <i class="fas fa-chevron-left" style="margin-right: auto; color: var(--text-light);"></i>
+            </a>
+            
+            <a href="https://instagram.com/lorven_26" target="_blank" class="contact-card">
+                <div class="contact-icon icon-ig"><i class="fab fa-instagram"></i></div>
+                <div class="contact-info">
+                    <h4>انستغرام</h4>
+                    <p>@lorven_26</p>
+                    <p style="font-size: 9px; color: #cc2366;">تابعنا للمستجدات</p>
+                </div>
+                <i class="fas fa-chevron-left" style="margin-right: auto; color: var(--text-light);"></i>
+            </a>
+            
+            <a href="https://tiktok.com/@lorven_26" target="_blank" class="contact-card">
+                <div class="contact-icon icon-tt"><i class="fab fa-tiktok"></i></div>
+                <div class="contact-info">
+                    <h4>تيك توك</h4>
+                    <p>@lorven_26</p>
+                    <p style="font-size: 9px; color: #000;">فيديوهات وشروحات</p>
+                </div>
+                <i class="fas fa-chevron-left" style="margin-right: auto; color: var(--text-light);"></i>
+            </a>
+        </div>
+        
+        <!-- معلومات إضافية -->
+        <div class="info-box">
+            <div class="info-row">
+                <i class="fas fa-clock"></i>
+                <span><strong>ساعات العمل:</strong> الأحد - الخميس، ٩ صباحاً - ٦ مساءً</span>
+            </div>
+            <div class="info-row">
+                <i class="fas fa-map-marker-alt"></i>
+                <span><strong>الموقع:</strong> اليمن</span>
+            </div>
+            <div class="info-row">
+                <i class="fas fa-globe"></i>
+                <span><strong>الموقع الإلكتروني:</strong> www.lorvenye.com</span>
+            </div>
+        </div>
+        
+        <!-- نموذج التواصل -->
+        <div class="form-card">
+            <h3><i class="fas fa-paper-plane"></i> أرسل رسالة</h3>
+            
+            <div class="success-message" id="successMsg">
+                <i class="fas fa-check-circle"></i>
+                تم إرسال رسالتك بنجاح! سنتواصل معك قريباً.
+            </div>
+            
+            <div class="form-group">
+                <label>الاسم الكامل</label>
+                <input type="text" id="contactName" placeholder="أدخل اسمك الكامل">
+            </div>
+            <div class="form-group">
+                <label>رقم الجوال</label>
+                <input type="tel" id="contactPhone" placeholder="77×××××××">
+            </div>
+            <div class="form-group">
+                <label>البريد الإلكتروني (اختياري)</label>
+                <input type="email" id="contactEmail" placeholder="example@email.com">
+            </div>
+            <div class="form-group">
+                <label>نوع الاستفسار</label>
+                <select id="contactType" style="
+                    width: 100%; padding: 12px 14px; border: 2px solid #E0D6D0;
+                    border-radius: 14px; font-family: inherit; font-size: 12px;
+                    color: #243048; background: #F8F4F0; outline: none;
+                ">
+                    <option value="">اختر نوع الاستفسار</option>
+                    <option value="technical">دعم فني</option>
+                    <option value="billing">استفسار مالي</option>
+                    <option value="suggestion">اقتراح</option>
+                    <option value="bug">الإبلاغ عن مشكلة</option>
+                    <option value="other">أخرى</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>الرسالة</label>
+                <textarea id="contactMessage" rows="4" placeholder="اكتب رسالتك هنا..."></textarea>
+            </div>
+            
+            <button class="submit-btn" onclick="sendContactMessage()">
+                <i class="fas fa-paper-plane"></i> إرسال
+            </button>
+        </div>
+        
+        <div class="footer">
+            <p>© 2026 LORVEN - جميع الحقوق محفوظة</p>
+            <p>فريق الدعم جاهز لخدمتك 🤍</p>
+        </div>
+    </div>
+    
+<script>
+function showToast(msg) {
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+        background: #243048; color: white; padding: 12px 24px;
+        border-radius: 30px; font-size: 13px; font-weight: 600;
+        z-index: 9999; animation: toastIn 0.3s ease;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    `;
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.style.animation = 'toastOut 0.3s ease forwards';
+        setTimeout(() => toast.remove(), 300);
+    }, 2000);
+}
+</script>
+<style>
+@keyframes toastIn { from { opacity: 0; top: 0; } to { opacity: 1; top: 20px; } }
+@keyframes toastOut { from { opacity: 1; } to { opacity: 0; } }
+</style>
+
+    <script>
+        function sendContactMessage() {
+            const name = document.getElementById('contactName').value.trim();
+            const phone = document.getElementById('contactPhone').value.trim();
+            const type = document.getElementById('contactType').value;
+            const message = document.getElementById('contactMessage').value.trim();
+            
+            if (!name) {
+                showToast('يرجى إدخال الاسم');
+                return;
+            }
+            if (!phone) {
+                showToast('يرجى إدخال رقم الجوال');
+                return;
+            }
+            if (!type) {
+                showToast('يرجى اختيار نوع الاستفسار');
+                return;
+            }
+            if (!message) {
+                showToast('يرجى كتابة الرسالة');
+                return;
+            }
+            
+            const whatsappMsg = `*رسالة جديدة من تطبيق LORVEN*%0A%0A` +
+                `👤 *الاسم:* ${name}%0A` +
+                `📱 *الجوال:* ${phone}%0A` +
+                `📧 *الإيميل:* ${document.getElementById('contactEmail').value || 'غير موجود'}%0A` +
+                `📂 *النوع:* ${type}%0A` +
+                `💬 *الرسالة:* ${message}`;
+            
+            window.open(`https://wa.me/967778051888?text=${whatsappMsg}`, '_blank');
+            
+            document.getElementById('successMsg').style.display = 'block';
+            document.getElementById('contactName').value = '';
+            document.getElementById('contactPhone').value = '';
+            document.getElementById('contactEmail').value = '';
+            document.getElementById('contactMessage').value = '';
+            document.getElementById('contactType').value = '';
+            
+            setTimeout(() => {
+                document.getElementById('successMsg').style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

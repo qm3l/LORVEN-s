@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <title id="dynamicTitle">LORVEN SYS</title>
+   
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    
+    <!-- Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="LORVEN">
+    <meta name="theme-color" content="#243048">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <div id="dynamicHeader" class="page-header"></div>
+        <div id="mainContent" class="main-content"></div>
+
+        <div class="bottom-nav" id="bottomNav">
+            <button class="nav-btn" onclick="switchPage('dashboard')"><i class="fas fa-home"></i><span data-i18n="home">الرئيسية</span></button>
+            <button class="nav-btn" onclick="switchPage('products')"><i class="fas fa-box"></i><span data-i18n="products">المنتجات</span></button>
+            <button class="nav-btn" onclick="switchPage('invoices')"><i class="fas fa-receipt"></i><span data-i18n="invoices">الفواتير</span></button>
+            <button class="nav-btn" onclick="switchPage('reports')"><i class="fas fa-chart-pie"></i><span data-i18n="reports">التقارير</span></button>
+            <button class="nav-btn" onclick="switchPage('settings')"><i class="fas fa-cog"></i><span data-i18n="settings">الإعدادات</span></button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">لورڤين 🌸</div>
+        </div>
+
+    <!-- Service Worker -->
+    <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(registration => {
+            console.log('✅ ServiceWorker registered');
+          })
+          .catch(error => {
+            console.log('❌ ServiceWorker registration failed:', error);
+          });
+      });
+    }
+    </script>
+
+    <!-- JavaScript Files -->
+    <script src="js/core/state.js"></script>
+    <script src="js/core/i18n.js"></script>
+    <script src="js/core/data.js"></script>
+    <script src="js/core/helpers.js"></script>
+
+    <script src="js/system/auth.js"></script>
+    <script src="js/system/import.js"></script>
+    <script src="js/system/backup.js"></script>
+    <script src="js/system/clearData.js"></script>
+
+    <script src="js/features/bundles.js"></script>
+    <script src="js/pages/notes.js"></script>
+    <script src="js/features/wishlist.js"></script>
+    <script src="js/features/notifications.js"></script>
+    <script src="js/features/search.js"></script>
+    <script src="js/features/export.js"></script>
+
+    <script src="js/pages/dashboard.js"></script>
+    <script src="js/pages/customers.js"></script>
+    <script src="js/pages/invoices.js"></script>
+    <script src="js/pages/debts.js"></script>
+    <script src="js/pages/loyalty.js"></script>
+    <script src="js/pages/invoiceHistory.js"></script>
+    <script src="js/pages/more.js"></script>
+    <script src="js/pages/shipments.js"></script>
+    <script src="js/pages/suppliers.js"></script>
+    <script src="js/pages/reports.js"></script>
+    <script src="js/pages/settings.js"></script>
+    <script src="js/system/sound.js"></script>
+
+    <script src="js/core/ui.js"></script>
+    <script src="js/main.js"></script>
+
+</body>
+</html>

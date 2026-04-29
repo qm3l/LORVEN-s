@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>الأسئلة الشائعة - LORVEN</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <style>
+        :root {
+            --bg: #F8F4F0;
+            --surface: #FFFFFF;
+            --text: #243048;
+            --text-soft: #8F8A88;
+            --text-light: #B0A8A0;
+            --border: #E0D6D0;
+            --accent: #e8919e;
+            --gold: #c8a84e;
+            --gradient: linear-gradient(135deg, #243048, #3A4A66);
+            --radius: 20px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'IBM Plex Sans Arabic', 'Segoe UI', sans-serif;
+            background: var(--gradient);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text);
+        }
+        
+        .container {
+            max-width: 380px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: var(--surface);
+            border-radius: 24px;
+            padding: 20px 24px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 16px;
+            position: relative;
+        }
+        
+        .back-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.25s;
+        }
+        
+        .back-btn:hover {
+            background: var(--text);
+            color: white;
+        }
+        
+        .header h2 {
+            font-size: 20px;
+            font-weight: 800;
+            margin-top: 8px;
+        }
+        
+        .header .icon-circle {
+            width: 50px;
+            height: 50px;
+            background: var(--bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 22px;
+            color: var(--accent);
+        }
+        
+        .search-box {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 12px 16px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .search-box input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-family: inherit;
+            font-size: 13px;
+            color: var(--text);
+            background: transparent;
+        }
+        
+        .search-box input::placeholder {
+            color: var(--text-light);
+        }
+        
+        .search-box i {
+            color: var(--text-soft);
+            font-size: 14px;
+        }
+        
+        .category-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+            margin: 20px 0 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .category-title i {
+            color: var(--accent);
+        }
+        
+        .faq-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .faq-item {
+            background: var(--surface);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .faq-question {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            transition: all 0.2s;
+            user-select: none;
+        }
+        
+        .faq-question:hover {
+            background: var(--bg);
+        }
+        
+        .faq-question i {
+            font-size: 12px;
+            color: var(--text-soft);
+            transition: transform 0.3s ease;
+        }
+        
+        .faq-item.open .faq-question i {
+            transform: rotate(180deg);
+            color: var(--accent);
+        }
+        
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.3s ease;
+            padding: 0 16px;
+            font-size: 11px;
+            color: var(--text-soft);
+            line-height: 1.8;
+        }
+        
+        .faq-item.open .faq-answer {
+            max-height: 300px;
+            padding: 0 16px 16px;
+        }
+        
+        .faq-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-left: 10px;
+            flex-shrink: 0;
+        }
+        
+        .contact-box {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .contact-box i {
+            font-size: 32px;
+            color: var(--accent);
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .contact-box h4 {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .contact-box p {
+            font-size: 11px;
+            color: var(--text-soft);
+            margin-bottom: 12px;
+        }
+        
+        .contact-box a {
+            display: inline-block;
+            padding: 10px 24px;
+            background: var(--text);
+            color: white;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .contact-box a:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(232,145,158,0.3);
+        }
+        
+        .footer {
+            text-align: center;
+            padding-bottom: 20px;
+        }
+        
+        .footer p {
+            font-size: 10px;
+            color: rgba(255,255,255,0.4);
+            margin: 2px 0;
+        }
+
+        .faq-question .q-text {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- الهيدر -->
+        <div class="header">
+            <a href="javascript:history.back()" class="back-btn"><i class="fas fa-arrow-right"></i></a>
+            <div class="icon-circle"><i class="fas fa-question-circle"></i></div>
+            <h2>الأسئلة الشائعة</h2>
+            <p style="font-size: 11px; color: #8F8A88; margin-top: 4px;">كل ما تحتاج معرفته عن التطبيق</p>
+        </div>
+        
+        <!-- البحث -->
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="ابحث عن سؤال..." id="faqSearch" oninput="filterFAQ()">
+        </div>
+        
+        <!-- أسئلة المنتجات -->
+        <div class="category-title">
+            <i class="fas fa-box"></i> المنتجات والمخزون
+        </div>
+        <div class="faq-list" id="faqList">
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span class="q-text"><span class="faq-number">١</span> كيف أضيف منتجاً جديداً؟</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>• اذهب إلى صفحة "المنتجات" من القائمة السفلية.</p>
+                    <p>• اضغط على زر <strong>+</strong> في الأعلى.</p>
+                    <p>• أدخل اسم المنتج، الباركود (أو اتركه فارغاً لتوليد تلقائي)، التكلفة، السعر، المخزون، والفئة.</p>
+                    <p>• اضغط "حفظ المنتج" وسيظهر فوراً في قائمتك.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span class="q-text"><span class="faq-number">٢</span> كيف أعدل منتجاً موجوداً؟</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>• اذهب لصفحة المنتجات.</p>
+                    <p>• اضغط على أي منتج من القائمة لفتح نافذة التعديل.</p>
+                    <p>• عدّل البيانات التي تريدها ثم اضغط "تحديث".</p>
+                    <p>• يمكنك أيضاً حذف المنتج من نفس النافذة.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span class="q-text"><span class="faq-number">٣</span> ما هو الباركود وكيف يعمل؟</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>• الباركود هو رمز تعريفي فريد لكل منتج.</p>
+                    <p>• عند تركه فارغاً، يتم توليد باركود تلقائي مكون من 13 رقماً.</p>
+                    <p>• يمكنك مسح الباركود لإضافة المنتج للفاتورة بسرعة.</p>
+                    <p>• الباركود يساعد في البحث السريع عن المنتجات.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span class="q-text"><span class="faq-number">٤</span> كيف أتابع المخزون؟</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>• المخزون يظهر في صفحة المنتجات بجانب كل منتج.</p>
+                    <p>• عند إنشاء فاتورة، ينقص المخزون تلقائياً.</p>
+                    <p>• راجع التقارير لمعرفة المنتجات الأكثر مبيعاً.</p>
+                    <p>• ضع حداً أدنى للمخزون لتصلك تنبيهات عند نقصه.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- أسئلة الفواتير -->
+        <div class="category-title">
+            <i class="fas fa-receipt"></i> الفواتير والمبيعات
+        </div>
+        <div class="faq-list">
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span class="q-text"><span class="faq-number">٥</span> كيف أنشئ فاتورة جديدة؟</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>• اذهب لصفحة "الفواتير".</p>
+                    <p>• اضغط "فاتورة جديدة".</p>
+                    <p>• اختر العميل (أو أضف عميلاً جديداً).</p>
+                    <p>• أضف المنتجات من القائمة أو امسح الباركود.</p>
+                    <p>• حدد طريقة الدفع والتوصيل.</p>
+                    <p>• اضغط "حفظ" ثم "إرسال" للواتساب.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span class="q-text"><span class="faq-number">٦</span> كيف أرسل الفاتورة للعميل؟</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>• بعد حفظ الفاتورة، اضغط على أيقونة واتساب.</p>
+                    <p>• ستظهر معاينة للرسالة مع رقم العميل.</p>
+                    <p>• يمكنك تعديل الرقم إذا لزم الأمر.</p>
+                    <p>• اضغط "إرسال" لتفتح الواتساب بالرسالة جاهزة.</p>
+                    <p>• يمكنك تخصيص قالب الرسالة من الإعدادات > التواصل.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span class="q-text"><span class="faq-number">٧</span> كيف أبحث عن فاتورة قديمة؟</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>• من صفحة الفواتير، اضغط أيقونة البحث.</p>
+                    <p>• ابحث برقم الفاتورة أو اسم العميل.</p>
+                    <p>• أو اذهب لـ "سجل الفواتير" لرؤية كل الفواتير مرتبة.</p>
+                    <p>• يمكنك الفلترة بالتاريخ أو العميل.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span class="q-text"><span class="faq-number">٨</span> ما هو العربون وكيف يعمل؟</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>• العربون هو مبلغ يدفعه العميل مقدماً.</p>
+                    <p>• يمكنك تعيينه كنسبة مئوية (مثلاً 30%) أو كمبلغ ثابت.</p>
+                    <p>• من الإعدادات > المدفوعات > العربون الافتراضي.</p>
+                    <p>• عند إنشاء فاتورة، يظهر العربون تلقائياً ويمكنك تعديله.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- أسئلة العملاء -->
+        <div class="category-title">
+            <i class="fas fa-users"></i> العملاء والتصنيفات
+        </div>
+        <div class="faq-list">
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span class="q-text"><span class="faq-number">٩</span> كيف تعمل تصنيفات العملاء؟</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>• العملاء يُصنفون تلقائياً حسب عدد مشترياتهم:</p>
+                    <p>• VIP: شراء 20 مرة أو أكثر (افتراضي).</p>
+                    <p>• ذهبي: شراء 10 مرات أو أكثر.</p>
+                    <p>• مميز: شراء 4 مرات أو أكثر.</p>
+                    <p>• يمكنك تعديل هذه الحدود من الإعدادات > العملاء.</p>
+                    <p>• يمكنك أيضاً تغيير ألوان التصنيفات كما تحب.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span class="q-text"><span class="faq-number">١٠</span> كيف أضيف عميلاً جديداً؟</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>• عند إنشاء فاتورة جديدة، أدخل اسم ورقم العميل.</p>
+                    <p>• إذا كان جديداً، يضاف تلقائياً لقائمة العملاء.</p>
+                    <p>• أو اذهب لصفحة العملاء واضغط زر الإضافة.</p>
+                    <p>• يمكنك رؤية كل مشتريات العميل بالضغط على اسمه.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- أسئلة الشحنات -->
+        <div class="category-title">
+            <i class="fas fa-truck"></i> الشحنات والتوصيل
+        </div>
+        <div class="faq-list">
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span class="q-text"><span class="faq-number">١١</span> كيف أضيف شحنة جديدة؟</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>• اذهب لصفحة "الشحنات".</p>
+                    <p>• اضغط "شحنة جديدة".</p>
+                    <p>• أدخل اسم المورد، عدد القطع، تاريخ الطلب.</p>
+                    <p>• مدة الشحن الافتراضية محددّة من الإعدادات.</p>
+                    <p>• تصلك تنبيهات قبل موعد وصول الشحنة.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span class="q-text"><span class="faq-number">١٢</span> كيف أعرف أن شحنة على وشك الوصول؟</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>• التطبيق يرسل تنبيهات تلقائية قبل وصول الشحنة.</p>
+                    <p>• يمكنك تحديد عدد الأيام من الإعدادات > الشحنات > التنبيهات.</p>
+                    <p>• الشحنات القريبة تظهر بلون مميز في لوحة التحكم.</p>
+                    <p>• تأكد من تفعيل الإشعارات في إعدادات جهازك.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- أسئلة الإعدادات والأمان -->
+        <div class="category-title">
+            <i class="fas fa-cog"></i> الإعدادات والأمان
+        </div>
+        <div class="faq-list">
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span class="q-text"><span class="faq-number">١٣</span> كيف أغير اللغة أو الوضع الليلي؟</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>• اذهب لـ الإعدادات > الإعدادات العامة.</p>
+                    <p>• اختر "اللغة" للتغيير بين العربية والإنجليزية.</p>
+                    <p>• اختر "الوضع الليلي" للتغيير بين داكن، فاتح، أو تلقائي.</p>
+                    <p>• التغيير يسري فوراً على كل صفحات التطبيق.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span class="q-text"><span class="faq-number">١٤</span> كيف أفعل قفل التطبيق؟</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>• اذهب لـ الإعدادات > الأمان.</p>
+                    <p>• فعّل "قفل التطبيق".</p>
+                    <p>• أدخل رمز PIN مكون من 4-6 أرقام.</p>
+                    <p>• اختر سؤالاً سرياً وإجابة لاسترجاع الرمز إذا نسيته.</p>
+                    <p>• عند فتح التطبيق سيطلب منك الرمز.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span class="q-text"><span class="faq-number">١٥</span> كيف أنسخ بياناتي احتياطياً؟</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>• اذهب لـ الإعدادات > النسخ الاحتياطي.</p>
+                    <p>• اضغط "تصدير نسخة" لتحميل ملف JSON بكل بياناتك.</p>
+                    <p>• للاستعادة، اضغط "استيراد نسخة" واختر الملف.</p>
+                    <p>• أنشئ نسخة احتياطية دورياً لحفظ بياناتك بأمان.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span class="q-text"><span class="faq-number">١٦</span> كيف أمسح كل البيانات؟</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>• اذهب لـ الإعدادات > مسح البيانات.</p>
+                    <p>• يمكنك اختيار مسح الفواتير فقط، العملاء فقط، الشحنات فقط، أو كل شيء.</p>
+                    <p>• سيطلب منك تأكيد قبل الحذف.</p>
+                    <p>• ⚠️ هذا الإجراء لا يمكن التراجع عنه، فاحرص على أخذ نسخة احتياطية أولاً.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- تواصل معنا -->
+        <div class="contact-box">
+            <i class="fas fa-headset"></i>
+            <h4>لم تجد إجابتك؟</h4>
+            <p>تواصل معنا مباشرة وسنساعدك فوراً</p>
+            <a href="contact.html"><i class="fas fa-paper-plane"></i> اتصل بنا</a>
+        </div>
+        
+        <div class="footer">
+            <p>© 2025 LORVEN - جميع الحقوق محفوظة</p>
+            <p>v3.0</p>
+        </div>
+    </div>
+    
+    <script>
+        function toggleFAQ(element) {
+            const item = element.parentElement;
+            const allItems = document.querySelectorAll('.faq-item');
+            allItems.forEach(el => {
+                if (el !== item) el.classList.remove('open');
+            });
+            item.classList.toggle('open');
+        }
+        
+        function filterFAQ() {
+            const query = document.getElementById('faqSearch').value.toLowerCase();
+            const items = document.querySelectorAll('.faq-item');
+            const categories = document.querySelectorAll('.category-title');
+            
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(query) ? 'block' : 'none';
+            });
+            
+            categories.forEach(cat => {
+                let next = cat.nextElementSibling;
+                let hasVisible = false;
+                while (next && next.classList.contains('faq-list')) {
+                    const visibleItems = next.querySelectorAll('.faq-item[style*="display: block"], .faq-item:not([style*="display"])');
+                    if (visibleItems.length > 0) hasVisible = true;
+                    next = next.nextElementSibling;
+                }
+                cat.style.display = hasVisible || !query ? 'block' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>
