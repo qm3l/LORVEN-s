@@ -1531,3 +1531,21 @@ function handleCSVFile(file) {
     };
     reader.readAsText(file);
 }
+function saveCommunicationSettings() {
+    settings.countryCode = document.getElementById('settingsCountryCode').value || '967';
+    settings.whatsappTemplate = document.getElementById('settingsWATemplate').value;
+    saveSettings();
+    document.getElementById('communicationSettingsModal')?.remove();
+    
+    // مزامنة تلقائية مع GitHub
+    fetch('/api/update-settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            key: 'whatsappTemplate',
+            value: settings.whatsappTemplate
+        })
+    }).catch(() => {});
+    
+    showToast(t('settingsSaved'));
+}
