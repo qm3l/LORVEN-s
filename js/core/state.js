@@ -51,23 +51,14 @@ var notes = [];
 // ==================== دوال التهيئة والإعدادات ====================
 
 // تهيئة التطبيق
-function initApp() {
+async function initApp() {
     if (isAppInitialized) return;
     
     console.log('⏳ Initializing LORVEN SYS...');
 
-    // تحميل البيانات (تأكد من وجود هذه الدوال في ملفات الـ core الأخرى)
-    if (typeof loadSettings === 'function') loadSettings();
-    if (typeof loadInvoices === 'function') loadInvoices();
-    if (typeof loadCustomers === 'function') loadCustomers();
-    if (typeof loadShipments === 'function') loadShipments();
-    if (typeof loadSuppliers === 'function') loadSuppliers();
-    if (typeof loadBundles === 'function') loadBundles();
-    if (typeof loadWishlist === 'function') loadWishlist();
-    if (typeof loadNotifications === 'function') loadNotifications();
-    if (typeof loadNotes === 'function') loadNotes();
+    await initDatabase();
+    loadData();
     
-    // تعيين اللغة والثيم
     applyLanguage();
     applyTheme();
     
