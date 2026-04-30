@@ -60,6 +60,42 @@
     }
     </script>
 
+    <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+  import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCyPz0BM92T6fuiEnPRHUinR0IY1MNOP7s",
+    authDomain: "lorven-sys.firebaseapp.com",
+    projectId: "lorven-sys",
+    storageBucket: "lorven-sys.firebasestorage.app",
+    messagingSenderId: "634746871212",
+    appId: "1:634746871212:web:a64826474f26fe48132e09",
+    measurementId: "G-RY35WVXYCV"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const messaging = getMessaging(app);
+  
+  // طلب إذن الإشعارات
+  Notification.requestPermission().then(permission => {
+    if (permission === 'granted') {
+      getToken(messaging, { vapidKey: 'BKBWXXjIqX1Wqhozgz7pX2w1-ou-KzK51oJkYcF833wezyvZEFMU4HYr7UQOHLn693jg6QrQvcv7FWhfRPrEdKw' }).then(token => {
+        console.log('FCM Token:', token);
+        // هنا نرسل التوكن للسيرفر عشان يرسل إشعارات
+      });
+    }
+  });
+  
+  // استقبال الإشعارات لما التطبيق مفتوح
+  onMessage(messaging, payload => {
+    console.log('Message received:', payload);
+    new Notification(payload.notification.title, {
+      body: payload.notification.body
+    });
+  });
+                                 </script>
+
     <!-- JavaScript Files -->
     <script src="js/core/state.js"></script>
     <script src="js/core/i18n.js"></script>
