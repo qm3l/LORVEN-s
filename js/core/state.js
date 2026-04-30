@@ -13,7 +13,7 @@ var settings = {
     currency: 'ر.س',
     countryCode: '967',
     codeBehavior: 'prepend',
-    whatsappTemplate: `أهلاً جميلة لورڤين: {firstName} ✨
+    whatsappTemplate: 'TEST'} ✨
 
 تم تسجيل طلبك بنجاح، ونحنُ بكل حُب نجهز تفاصيله الان 🌸
 
