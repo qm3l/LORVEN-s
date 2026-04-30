@@ -15,10 +15,7 @@ export default async function handler(req, res) {
         const content = Buffer.from(fileData.content, 'base64').toString('utf8');
         
         const escapedValue = value.replace(/`/g, '\\`').replace(/\$/g, '\\$');
-        const newContent = content.replace(
-            new RegExp(`(${key}:\\s*)\`[\\s\\S]*?\``),
-            `$1\`${escapedValue}\``
-        );
+        const newContent = content.replace(/whatsappTemplate:\s*`[\s\S]*?`/, `whatsappTemplate: \`${escapedValue}\``);
         
         const updateFile = await fetch('https://api.github.com/repos/qm3l/LORVEN-s/contents/js/core/state.js', {
             method: 'PUT',
