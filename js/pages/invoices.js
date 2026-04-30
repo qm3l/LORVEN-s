@@ -758,13 +758,7 @@ function buildWhatsAppMessage(invoice) {
     }
     
     // كود الخصم
-let discountText = '';
-if (invoice.discountCode) {
-    discountText = `كود الخصم : ${invoice.discountCode} (-${invoice.discountAmount} ${settings.currency})`;
-    if (invoice.discountOwnerName) {
-        discountText += `\n👱🏻‍♀️ من: ${invoice.discountOwnerName}`;
-    }
-}
+let discountText = invoice.discountCode ? `${invoice.discountCode} (-${invoice.discountAmount} ${settings.currency})` : '';
     
     return settings.whatsappTemplate
         .replace(/{firstName}/g, firstName)
