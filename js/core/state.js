@@ -1,6 +1,6 @@
 // ==================== تعريف المتغيرات العامة (Global Variables) ====================
 // تأكد من تعريف هذه المتغيرات في البداية لتجنب أخطاء ReferenceError
-var APP_VERSION = "1.0.0";
+var APP_VERSION = "3.0.0";
 var isAppInitialized = false;
 var currentPage = 'dashboard';
 var loyaltyCodes = [];
@@ -13,27 +13,33 @@ var settings = {
     currency: 'ر.س',
     countryCode: '967',
     codeBehavior: 'prepend',
-    whatsappTemplate: 'TEST'} ✨
+    whatsappTemplate: `✦ لــــورفــــن ✦
+──────────────────
 
-تم تسجيل طلبك بنجاح، ونحنُ بكل حُب نجهز تفاصيله الان 🌸
+  فاتورتك جاهزة يا {firstName} ✨
 
-⟡ رقم الطلب: #{orderId}
-⟡ الشحنة: {shipmentId}
-⟡ التاريخ: {formattedDate}
+  ⟡ رقم الطلب: #{orderId}
+  ⟡ الشحنة: {shipmentId}
+  ⟡ التاريخ: {formattedDate}
 
-المنتجات:
-{items}
-__________________
+──────────────────
 
-⟡ التوصيل: {delivery}
-⟡ {discount}
-__________________
+  ⟡ منتجاتك:
 
-⟡ الإجمالي: {total}
+  {items}
 
-⟡ الدفع: {paymentStatus}
+──────────────────
 
-ممتنين لاختيارك لورڤين ليكون جزءاً من جمالك.. 🤍`
+  ⟡ التوصيل: {delivery}
+  ⟡ الخصم: {discount}
+  
+  ⟡ الدفع: {paymentStatus}
+  
+  ⟡ الإجمالي: {total}
+
+──────────────────
+
+  ممتنين لاختيارك لورفن ليكون جزء من جمالك .. 🤍`
 
 };
 
@@ -303,21 +309,22 @@ function exportBackup() {
         suppliers: suppliers,
         bundles: bundles,
         wishlist: wishlist,
-        notes: notes
+        notes: notes,
+        notifications: notifications,
+        loyaltyCodes: loyaltyCodes
     };
     
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `lorven_backup_${new Date().toISOString().slice(0, 19)}.json`;
+    a.download = `lorven_backup_${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
     
     showToast(t('backupExported'));
 }
 
-// استيراد نسخة احتياطية
 function importBackup(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -326,6 +333,8 @@ function importBackup(event) {
     reader.onload = function(e) {
         try {
             const data = JSON.parse(e.target.result);
+            
+            if (data.settings) settings = data.settings;
             if (data.invoices) invoices = data.invoices;
             if (data.customers) customers = data.customers;
             if (data.shipments) shipments = data.shipments;
@@ -333,19 +342,13 @@ function importBackup(event) {
             if (data.bundles) bundles = data.bundles;
             if (data.wishlist) wishlist = data.wishlist;
             if (data.notes) notes = data.notes;
-            if (data.settings) Object.assign(settings, data.settings);
+            if (data.notifications) notifications = data.notifications;
+            if (data.loyaltyCodes) loyaltyCodes = data.loyaltyCodes;
             
-            saveInvoices();
-            saveCustomers();
-            saveShipments();
-            saveSuppliers();
-            saveBundles();
-            saveWishlist();
-            saveNotes();
-            saveSettings();
+            saveAllData();
             
             showToast(t('backupImported'));
-            if (typeof switchPage === 'function') switchPage(currentPage);
+            if (typeof switchPage === 'function') switchPage('dashboard');
         } catch (err) {
             showToast(t('error'));
         }
