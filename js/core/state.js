@@ -1,6 +1,6 @@
 // ==================== تعريف المتغيرات العامة (Global Variables) ====================
 // تأكد من تعريف هذه المتغيرات في البداية لتجنب أخطاء ReferenceError
-var APP_VERSION = "3.0.0";
+var APP_VERSION = "1.1.0";
 var isAppInitialized = false;
 var currentPage = 'dashboard';
 var loyaltyCodes = [];
