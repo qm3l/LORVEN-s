@@ -62,7 +62,7 @@
     
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js";
+import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCyPz0BM92T6fuiEnPRHUinR0IY1MNOP7s",
@@ -77,11 +77,24 @@ const app = initializeApp(firebaseConfig);
 window.messaging = getMessaging(app);
 
 Notification.requestPermission().then(p => {
-  if (p === 'granted') {
-    getToken(window.messaging, {vapidKey: 'BKBWXXjIqX1Wqhozgz7pX2w1-ou-KzK51oJkYcF833wezyvZEFMU4HYr7UQOHLn693jg6QrQvcv7FWhfRPrEdKw'}).then(token => {
-      console.log('Token:', token);
-    });
-  }
+    if (p === 'granted') {
+        getToken(window.messaging, {vapidKey: 'YOUR_VAPID_KEY'}).then(token => {
+            console.log('Token:', token);
+            document.body.insertAdjacentHTML('beforeend', `<div style="position:fixed;top:10px;left:10px;background:white;color:black;padding:6px;z-index:99999;font-size:9px;max-width:90%;word-break:break-all">Token: ${token}</div>`);
+        }).catch(e => console.log('Token error:', e));
+    }
+});
+
+onMessage(messaging, payload => {
+    console.log('Message received:', payload);
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then(registration => {
+            registration.showNotification(payload.notification.title, {
+                body: payload.notification.body,
+                icon: '/icons/icon-192.png'
+            });
+        });
+    }
 });
 </script>
 
