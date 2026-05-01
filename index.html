@@ -24,7 +24,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="LORVEN">
-    <meta name="theme-color" content="#243048">
+    <meta name="theme-color" content="#121A2B">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
@@ -78,7 +79,7 @@ window.messaging = getMessaging(app);
 
 Notification.requestPermission().then(p => {
     if (p === 'granted') {
-        getToken(window.messaging, {vapidKey: 'YOUR_VAPID_KEY'}).then(token => {
+        getToken(window.messaging, {vapidKey: 'BKBWXXjIqX1Wqhozgz7pX2w1-ou-KzK51oJkYcF833wezyvZEFMU4HYr7UQOHLn693jg6QrQvcv7FWhfRPrEdKw'}).then(token => {
             console.log('Token:', token);
             document.body.insertAdjacentHTML('beforeend', `<div style="position:fixed;top:10px;left:10px;background:white;color:black;padding:6px;z-index:99999;font-size:9px;max-width:90%;word-break:break-all">Token: ${token}</div>`);
         }).catch(e => console.log('Token error:', e));
