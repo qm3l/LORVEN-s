@@ -5,8 +5,8 @@
   "scope": ".",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
-  "background_color": "#F8F4EB",
-  "theme_color": "#243048",
+  "background_color": "#E7DBCD",
+  "theme_color": "#121A2B",
   "orientation": "portrait",
   "icons": [
     {
