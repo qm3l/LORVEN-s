@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="css/all.min.css">
     
     <!-- Charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -75,30 +75,36 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-window.messaging = getMessaging(app);
+const messaging = getMessaging(app);
 
-Notification.requestPermission().then(p => {
-    if (p === 'granted') {
-        getToken(window.messaging, {vapidKey: 'BKBWXXjIqX1Wqhozgz7pX2w1-ou-KzK51oJkYcF833wezyvZEFMU4HYr7UQOHLn693jg6QrQvcv7FWhfRPrEdKw'}).then(token => {
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('firebase-messaging-sw.js')
+    .then((registration) => {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          getToken(messaging, {
+            serviceWorkerRegistration: registration,
+            vapidKey: 'BKBWXXjIqX1Wqhozgz7pX2w1-ou-KzK51oJkYcF833wezyvZEFMU4HYr7UQOHLn693jg6QrQvcv7FWhfRPrEdKw'
+          }).then(token => {
             console.log('Token:', token);
-            document.body.insertAdjacentHTML('beforeend', `<div style="position:fixed;top:10px;left:10px;background:white;color:black;padding:6px;z-index:99999;font-size:9px;max-width:90%;word-break:break-all">Token: ${token}</div>`);
-        }).catch(e => console.log('Token error:', e));
-    }
-});
+            const tokenDiv = document.createElement('div');
+            tokenDiv.style = "position:fixed;bottom:10px;left:10px;background:rgba(0,0,0,0.8);color:white;padding:5px;z-index:9999;font-size:8px;max-width:80%;word-break:break-all;border-radius:4px;";
+            tokenDiv.innerText = `Token: ${token}`;
+            document.body.appendChild(tokenDiv);
+          });
+        }
+      });
+    });
+}
 
-onMessage(messaging, payload => {
-    console.log('Message received:', payload);
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.ready.then(registration => {
-            registration.showNotification(payload.notification.title, {
-                body: payload.notification.body,
-                icon: '/icons/icon-192.png'
-            });
-        });
-    }
+onMessage(messaging, (payload) => {
+  new Notification(payload.notification.title, {
+    body: payload.notification.body,
+    icon: '/icons/icon-192.png'
+  });
 });
 </script>
-
+    
     <!-- JavaScript Files -->
     <script src="js/core/state.js"></script>
     <script src="js/core/i18n.js"></script>
