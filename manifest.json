@@ -1,8 +1,8 @@
 {
   "name": "LORVEN SYS",
   "short_name": "LORVEN",
-  "start_url": ".",
-  "scope": ".",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
   "background_color": "#E7DBCD",
