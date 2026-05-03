@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lorven-cache-v4';
+const CACHE_NAME = 'lorven-cache-v5';
 
 const urlsToCache = [
   '/',
@@ -25,6 +25,7 @@ const urlsToCache = [
   '/js/pages/settings.js',
   '/js/pages/shipments.js',
   '/js/pages/suppliers.js',
+  '/js/jspdf.umd.min.js',
   '/js/main.js',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
