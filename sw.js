@@ -3,6 +3,10 @@ const CACHE_NAME = 'lorven-cache-v5';
 const urlsToCache = [
   '/',
   '/index.html',
+  '/about.html',
+'/faq.html',
+'/privacy.html',
+'/contact.html',
   '/css/style.css',
   '/css/all.min.css',
   '/webfonts/fa-solid-900.woff2',
