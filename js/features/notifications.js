@@ -165,7 +165,7 @@ function renderNotificationsPage(container) {
     
     if (notifications.length === 0) {
         html += `
-            <div style="text-align: center; padding: 40px; color: var(--text-soft);">
+            <div style="text-align: center; padding-top: 30vh; color: var(--text-soft);">
                 <i class="fas fa-bell-slash" style="font-size: 48px; margin-bottom: 12px;"></i>
                 <p>${lang === 'en' ? 'No notifications' : 'لا توجد إشعارات'}</p>
             </div>

@@ -29,12 +29,9 @@ function renderBundlesList() {
     
     if (bundles.length === 0) {
         container.innerHTML = `
-            <div style="text-align: center; padding: 40px; color: var(--text-soft);">
+            <div style="text-align: center; padding-top: 30vh; color: var(--text-soft);">
                 <i class="fas fa-cube" style="font-size: 48px; margin-bottom: 12px; opacity: 0.3;"></i>
                 <p>${lang === 'en' ? 'No boxes yet' : 'لا توجد بوكسات'}</p>
-                <button class="btn btn-primary" style="margin-top: 12px;" onclick="openBundleModal()">
-                    <i class="fas fa-plus"></i> ${lang === 'en' ? 'Add First Box' : 'أضف أول بوكس'}
-                </button>
             </div>
         `;
         return;

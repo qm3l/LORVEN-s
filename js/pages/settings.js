@@ -225,6 +225,7 @@ function closeAllModalsAndSaveLanguage() {
         applyLanguage();
         document.querySelectorAll('.modal').forEach(m => m.remove());
         showToast(t('settingsSaved'));
+        playSound('success');
         if (typeof switchPage === 'function') switchPage(currentPage);
     }
 }
@@ -238,6 +239,7 @@ function closeAllModalsAndSaveDarkMode() {
         applyTheme();
         document.querySelectorAll('.modal').forEach(m => m.remove());
         showToast(t('settingsSaved'));
+        playSound('success');
     }
 }
 function setGeneralSetting(key, value) {
@@ -623,8 +625,8 @@ function openCustomerLimitsModal() {
                     <input type="number" class="form-control" id="customerSilverLimit" value="${settings.silverLimit || 4}" min="1">
                 </div>
                 <div style="display: flex; gap: 8px; margin-top: 16px;">
+                <button class="btn btn-outline" style="flex: 1;" id="cancelLimitsBtn">${lang === 'en' ? 'Cancel' : 'إلغاء'}</button>
                     <button class="btn btn-primary" style="flex: 1;" id="saveLimitsBtn">${lang === 'en' ? 'Save' : 'حفظ'}</button>
-                    <button class="btn btn-outline" style="flex: 1;" id="cancelLimitsBtn">${lang === 'en' ? 'Cancel' : 'إلغاء'}</button>
                 </div>
             </div>
         </div>
@@ -676,8 +678,8 @@ function openCustomerColorsModal() {
                     <input type="color" class="form-control" id="customerSilverColor" value="${settings.silverColor || '#7c5cbf'}" style="height: 45px;">
                 </div>
                 <div style="display: flex; gap: 8px; margin-top: 16px;">
+                  <button class="btn btn-outline" style="flex: 1;" id="cancelColorsBtn">${lang === 'en' ? 'Cancel' : 'إلغاء'}</button>
                     <button class="btn btn-primary" style="flex: 1;" id="saveColorsBtn">${lang === 'en' ? 'Save' : 'حفظ'}</button>
-                    <button class="btn btn-outline" style="flex: 1;" id="cancelColorsBtn">${lang === 'en' ? 'Cancel' : 'إلغاء'}</button>
                 </div>
             </div>
         </div>
@@ -885,60 +887,43 @@ function openNotificationSettings() {
                 <div class="modal-close" onclick="this.closest('.modal').remove()">&times;</div>
             </div>
             <div class="modal-body">
-                <button class="option-btn ${settings.notifyInvoiceNotSent ? 'selected' : ''}" data-notify="notifyInvoice">
+                <button class="option-btn ${settings.notifyInvoiceNotSent ? 'selected' : ''}" data-notify="notifyInvoiceNotSent" onclick="toggleNotifySetting(this, 'notifyInvoiceNotSent')">
                     <span style="flex: 1; text-align: right;">${lang === 'en' ? 'Invoice not sent reminder' : 'تذكير فاتورة غير مرسلة'}</span>
                     <i class="fas ${settings.notifyInvoiceNotSent ? 'fa-check-circle' : 'fa-circle'}" style="color: ${settings.notifyInvoiceNotSent ? 'var(--green)' : 'var(--text-soft)'}; font-size: 18px;"></i>
                 </button>
-                <button class="option-btn ${settings.notifyDebtReminder ? 'selected' : ''}" data-notify="notifyDebt">
+                <button class="option-btn ${settings.notifyDebtReminder ? 'selected' : ''}" data-notify="notifyDebtReminder" onclick="toggleNotifySetting(this, 'notifyDebtReminder')">
                     <span style="flex: 1; text-align: right;">${lang === 'en' ? 'Pending debt reminder' : 'تذكير الديون المعلقة'}</span>
                     <i class="fas ${settings.notifyDebtReminder ? 'fa-check-circle' : 'fa-circle'}" style="color: ${settings.notifyDebtReminder ? 'var(--green)' : 'var(--text-soft)'}; font-size: 18px;"></i>
                 </button>
-                <button class="option-btn ${settings.notifyShipmentBefore ? 'selected' : ''}" data-notify="notifyShipmentBefore">
+                <button class="option-btn ${settings.notifyShipmentBefore ? 'selected' : ''}" data-notify="notifyShipmentBefore" onclick="toggleNotifySetting(this, 'notifyShipmentBefore')">
                     <span style="flex: 1; text-align: right;">${lang === 'en' ? 'Shipment arriving soon' : 'تنبيه شحنة قربت توصل'}</span>
                     <i class="fas ${settings.notifyShipmentBefore ? 'fa-check-circle' : 'fa-circle'}" style="color: ${settings.notifyShipmentBefore ? 'var(--green)' : 'var(--text-soft)'}; font-size: 18px;"></i>
                 </button>
-                <button class="option-btn ${settings.notifyShipmentArrived ? 'selected' : ''}" data-notify="notifyShipmentArrived">
+                <button class="option-btn ${settings.notifyShipmentArrived ? 'selected' : ''}" data-notify="notifyShipmentArrived" onclick="toggleNotifySetting(this, 'notifyShipmentArrived')">
                     <span style="flex: 1; text-align: right;">${lang === 'en' ? 'Shipment arrived' : 'تنبيه وصول الشحنة'}</span>
                     <i class="fas ${settings.notifyShipmentArrived ? 'fa-check-circle' : 'fa-circle'}" style="color: ${settings.notifyShipmentArrived ? 'var(--green)' : 'var(--text-soft)'}; font-size: 18px;"></i>
                 </button>
                 <div style="display: flex; gap: 8px; margin-top: 16px;">
-                                    <button class="btn btn-outline" style="flex: 1;" id="cancelNotifyBtn">${lang === 'en' ? 'Cancel' : 'إلغاء'}</button>
-                    <button class="btn btn-primary" style="flex: 1;" id="saveNotifyBtn">${lang === 'en' ? 'Save' : 'حفظ'}</button>
+                    <button class="btn btn-outline" style="flex: 1;" onclick="this.closest('.modal').remove()">${lang === 'en' ? 'Cancel' : 'إلغاء'}</button>
+                    <button class="btn btn-primary" style="flex: 1;" onclick="this.closest('.modal').remove(); saveSettings(); showToast(t('settingsSaved'));">${lang === 'en' ? 'Save' : 'حفظ'}</button>
                 </div>
             </div>
         </div>
     `;
     document.body.appendChild(modal);
-    
-    // تفعيل التبديل عند النقر
-    modal.querySelectorAll('.option-btn[data-notify]').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const notifyKey = this.getAttribute('data-notify');
-            settings[notifyKey] = !settings[notifyKey];
-            const icon = this.querySelector('i');
-            if (settings[notifyKey]) {
-                this.classList.add('selected');
-                icon.className = 'fas fa-check-circle';
-                icon.style.color = 'var(--green)';
-            } else {
-                this.classList.remove('selected');
-                icon.className = 'fas fa-circle';
-                icon.style.color = 'var(--text-soft)';
-            }
-        });
-    });
-    
-    // زر الحفظ
-    document.getElementById('saveNotifyBtn').addEventListener('click', function() {
-        saveSettings();
-        document.querySelectorAll('.modal').forEach(m => m.remove());
-        showToast(t('settingsSaved'));
-    });
-    
-    // زر الإلغاء
-    document.getElementById('cancelNotifyBtn').addEventListener('click', function() {
-        modal.remove();
-    });
+}
+
+function toggleNotifySetting(btn, key) {
+    settings[key] = !settings[key];
+    btn.classList.toggle('selected');
+    const icon = btn.querySelector('i');
+    if (settings[key]) {
+        icon.className = 'fas fa-check-circle';
+        icon.style.color = 'var(--green)';
+    } else {
+        icon.className = 'fas fa-circle';
+        icon.style.color = 'var(--text-soft)';
+    }
 }
 // ==================== مودال التواصل ====================
 function openCommunicationSettings() {
@@ -1003,8 +988,8 @@ function openCountryCodeModal() {
                 <button class="option-btn ${settings.codeBehavior === 'prepend' ? 'selected' : ''}" data-behavior="prepend">${lang === 'en' ? 'Auto add code' : 'إضافة الرمز تلقائياً'}</button>
                 <button class="option-btn ${settings.codeBehavior === 'asis' ? 'selected' : ''}" data-behavior="asis">${lang === 'en' ? 'Use as is' : 'استخدم الرقم كما هو'}</button>
                 <div style="display: flex; gap: 8px; margin-top: 16px;">
+                                    <button class="btn btn-outline" style="flex: 1;" id="cancelCodeBtn">${lang === 'en' ? 'Cancel' : 'إلغاء'}</button>
                     <button class="btn btn-primary" style="flex: 1;" id="saveCodeBtn">${lang === 'en' ? 'Save' : 'حفظ'}</button>
-                    <button class="btn btn-outline" style="flex: 1;" id="cancelCodeBtn">${lang === 'en' ? 'Cancel' : 'إلغاء'}</button>
                 </div>
             </div>
         </div>
@@ -1087,8 +1072,8 @@ function openWATemplateModal() {
 function openSecuritySettings() {
     const lang = settings.language;
     const isOn = settings.appLock === 'on';
-    const pinExists = settings.pinCode && settings.pinCode.length > 0;
-    
+const pinExists = settings.pinCode && String(settings.pinCode).length > 0;
+
     const modal = document.createElement('div');
     modal.className = 'modal bottom-sheet';
     modal.id = 'securitySettingsModal';
@@ -1103,13 +1088,26 @@ function openSecuritySettings() {
                 <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 12px; text-align: right;">${lang === 'en' ? 'App Lock' : 'قفل التطبيق'}</p>
                 <button class="option-btn ${!isOn ? 'selected' : ''}" onclick="setAppLock('off')">${lang === 'en' ? 'Off' : 'غير مفعل'}</button>
                 <button class="option-btn ${isOn ? 'selected' : ''}" onclick="setAppLock('on')">${lang === 'en' ? 'On' : 'مفعل'}</button>
-                
+                ${isOn ? `
+    <button class="option-btn ${settings.biometricEnabled ? 'selected' : ''}" onclick="toggleBiometric()" style="margin-top: 8px;">
+        <span style="flex: 1; text-align: right;">
+            <i class="fas fa-fingerprint"></i> ${lang === 'en' ? 'Biometric Lock' : 'قفل البصمة'}
+        </span>
+        <i class="fas ${settings.biometricEnabled ? 'fa-check-circle' : 'fa-circle'}" style="color: ${settings.biometricEnabled ? 'var(--green)' : 'var(--text-soft)'}; font-size: 18px;"></i>
+    </button>
+` : ''}
                 <div id="securityFields" style="display: ${isOn ? 'block' : 'none'};">
                     ${!pinExists ? `
                         <div class="form-group" style="text-align: right; margin-top: 16px;">
                             <label class="form-label">PIN ${lang === 'en' ? 'digits' : 'رمز PIN'} <span style="color: var(--red);">*</span></label>
-                            <input type="password" class="form-control" id="settingsPin" maxlength="6" inputmode="numeric" style="font-size: 20px; text-align: center; letter-spacing: 6px;" placeholder="ادخل 4-6 ارقام">
+<div style="position: relative;">
+    <input type="password" class="form-control" id="settingsPin" maxlength="6" inputmode="numeric" style="font-size: 20px; text-align: center; letter-spacing: 6px; padding-right: 40px;" placeholder="ادخل 4-6 ارقام">
+    <span class="password-toggle" onclick="var e=document.getElementById('settingsPin'); var i=this.querySelector('i'); if(e.type==='password'){e.type='text'; i.className='fas fa-eye-slash';} else {e.type='password'; i.className='fas fa-eye';}" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #8F8A88; font-size: 16px;">
+        <i class="fas fa-eye"></i>
+    </span>
+</div>
                         </div>
+                
                         <div class="form-group" style="text-align: right;">
                             <label class="form-label">${lang === 'en' ? 'Security Question' : 'السؤال السري'} <span style="color: var(--red);">*</span></label>
                             <input type="text" class="form-control" id="settingsSecurityQuestion" placeholder="${lang === 'en' ? 'Note: Remember the question carefully' :'ملاحظة: تذكر السؤال جيداً'}">
@@ -1133,7 +1131,13 @@ function openSecuritySettings() {
                             </div>
                             <div class="form-group" style="text-align: right;">
                                 <label class="form-label">${lang === 'en' ? 'New PIN' : 'الرمز الجديد'}</label>
-                                <input type="password" class="form-control" id="settingsNewPin" maxlength="6" inputmode="numeric" style="font-size: 20px; text-align: center; letter-spacing: 6px;" placeholder="••••••">
+
+<div style="position: relative;">
+    <input type="password" class="form-control" id="settingsNewPin" maxlength="6" inputmode="numeric" style="font-size: 20px; text-align: center; letter-spacing: 6px; padding-right: 40px;" placeholder="••••••">
+    <span class="password-toggle" onclick="var e=document.getElementById('settingsNewPin'); var i=this.querySelector('i'); if(e.type==='password'){e.type='text'; i.className='fas fa-eye-slash';} else {e.type='password'; i.className='fas fa-eye';}" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #8F8A88; font-size: 16px;">
+        <i class="fas fa-eye"></i>
+    </span>
+</div>
                             </div>
                             <button class="btn btn-primary" style="width: 100%; margin-top: 8px;" onclick="changePinCode()">${lang === 'en' ? 'Change' : 'تغيير'}</button>
                         </div>
@@ -1157,7 +1161,9 @@ function setAppLock(value) {
         modal.querySelectorAll('.option-btn').forEach((b, i) => {
             b.classList.toggle('selected', i === (value === 'off' ? 0 : 1));
         });
+        modal.remove();
     }
+    openSecuritySettings();
 }
 
 function showChangePinForm() {
@@ -1178,10 +1184,11 @@ function changePinCode() {
         return;
     }
     
-    settings.pinCode = newPin;
+settings.pinCode = String(pin);
     saveSettings();
     document.querySelectorAll('.modal').forEach(m => m.remove());
     showToast(lang === 'en' ? 'PIN changed successfully' : 'تم تغيير الرمز بنجاح');
+    playSound('success');
 }
 
 function saveSecuritySettings() {
@@ -1212,6 +1219,7 @@ function saveSecuritySettings() {
     saveSettings();
     document.querySelectorAll('.modal').forEach(m => m.remove());
     showToast(t('settingsSaved'));
+    playSound('success');
 }
 
 // ==================== مودال تسجيل الخروج ====================
@@ -1362,6 +1370,7 @@ function clearDataType(type) {
         
         document.querySelectorAll('.modal').forEach(m => m.remove());
         showToast(t('dataCleared'));
+        playSound('delete');
         if (typeof switchPage === 'function') switchPage('dashboard');
     });
 }
@@ -1369,132 +1378,27 @@ function clearDataType(type) {
 // ==================== دوال مساعدة ====================
 function toggleSound() {
     soundEnabled = !soundEnabled;
-    document.getElementById('settingsSoundIcon').className = 'fas ' + (soundEnabled ? 'fa-volume-up' : 'fa-volume-mute');
-    document.getElementById('settingsSoundLabel').textContent = soundEnabled ? (settings.language === 'en' ? 'Sound On' : 'مفعل') : (settings.language === 'en' ? 'Mute' : 'صامت');
+    settings.soundEnabled = soundEnabled;
+    saveSettings();
+    
+    // ✅ تحديث الأيقونة مباشرة
+    const icon = document.getElementById('settingsSoundIcon');
+    const label = document.getElementById('settingsSoundLabel');
+    
+    if (icon) {
+        icon.className = 'fas ' + (soundEnabled ? 'fa-volume-up' : 'fa-volume-mute');
+    }
+    if (label) {
+        const lang = settings.language;
+        label.textContent = soundEnabled ? (lang === 'en' ? 'Sound On' : 'مفعل') : (lang === 'en' ? 'Mute' : 'صامت');
+    }
+    
+    if (soundEnabled) playSound('success');
+    showToast(soundEnabled ? '✅ الصوت مفعل' : '🔇 الصوت معطل');
+    
+    return soundEnabled;
 }
-function openBackupModal() {
-    const lang = settings.language;
-    const modal = document.createElement('div');
-    modal.className = 'modal bottom-sheet';
-    modal.style.display = 'flex';
-    modal.innerHTML = `
-        <div class="modal-content bottom-sheet-content" style="text-align: center;">
-            <div class="modal-header">
-                <div class="modal-title"><i class="fas fa-cloud-upload-alt"></i> ${lang === 'en' ? 'Backup' : 'النسخ الاحتياطي'}</div>
-                <div class="modal-close" onclick="this.closest('.modal').remove()">&times;</div>
-            </div>
-            <div class="modal-body">
-                <i class="fas fa-cloud" style="font-size: 48px; color: var(--text-soft); margin-bottom: 12px;"></i>
-                <p style="font-size: 13px; margin-bottom: 20px;">${lang === 'en' ? 'Export or restore your data' : 'تصدير أو استعادة بياناتك'}</p>
-                
-                <button class="option-btn" id="exportBtn">
-                    <span style="flex: 1; text-align: right;">${lang === 'en' ? 'Export All Data' : 'تصدير كل البيانات'}</span>
-                    <i class="fas fa-download" style="color: var(--text-soft);"></i>
-                </button>
-                <button class="option-btn" id="importBtn">
-                    <span style="flex: 1; text-align: right;">${lang === 'en' ? 'Import Data' : 'استيراد البيانات'}</span>
-                    <i class="fas fa-upload" style="color: var(--text-soft);"></i>
-                </button>
-                
-                <input type="file" id="importFileInput" accept=".json" style="display: none;">
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-    
-    // تصدير
-    document.getElementById('exportBtn').addEventListener('click', function() {
-        const data = {
-            invoices: invoices,
-            customers: customers,
-            shipments: shipments,
-            settings: settings,
-            notifications: notifications,
-            wishlist: wishlist,
-            notes: notes,
-            version: APP_VERSION,
-            exportDate: new Date().toISOString()
-        };
-        
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `lorven_backup_${new Date().toISOString().slice(0,10)}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        
-        showToast(lang === 'en' ? 'Backup downloaded' : 'تم تحميل النسخة الاحتياطية');
-        modal.remove();
-    });
-    
-    // استيراد
-    document.getElementById('importBtn').addEventListener('click', function() {
-        document.getElementById('importFileInput').click();
-    });
-    
-    document.getElementById('importFileInput').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            try {
-                const data = JSON.parse(event.target.result);
-                
-                if (!data.version) {
-                    throw new Error('Invalid backup file');
-                }
-                
-                // تأكيد الاستيراد
-                const confirmModal = document.createElement('div');
-                confirmModal.className = 'modal bottom-sheet';
-                confirmModal.style.display = 'flex';
-                confirmModal.innerHTML = `
-                    <div class="modal-content bottom-sheet-content" style="text-align: center;">
-                        <div class="modal-header">
-                            <div class="modal-title">${lang === 'en' ? 'Confirm Import' : 'تأكيد الاستيراد'}</div>
-                            <div class="modal-close" onclick="this.closest('.modal').remove()">&times;</div>
-                        </div>
-                        <div class="modal-body">
-                            <i class="fas fa-exclamation-triangle" style="font-size: 40px; color: var(--orange); margin-bottom: 12px;"></i>
-                            <p style="font-size: 14px; margin-bottom: 8px;">${lang === 'en' ? 'This will replace all current data!' : 'هذا سيستبدل كل البيانات الحالية!'}</p>
-                            <p style="font-size: 11px; color: var(--text-soft); margin-bottom: 16px;">${lang === 'en' ? 'Backup date:' : 'تاريخ النسخة:'} ${new Date(data.exportDate).toLocaleDateString()}</p>
-                            <div style="display: flex; gap: 8px;">
-                                                            <button class="btn btn-outline" style="flex: 1;" onclick="this.closest('.modal').remove()">${lang === 'en' ? 'Cancel' : 'إلغاء'}</button>
-                                <button class="btn btn-primary" style="flex: 1;" id="confirmImportBtn">${lang === 'en' ? 'Import' : 'استيراد'}</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                document.body.appendChild(confirmModal);
-                
-                document.getElementById('confirmImportBtn').addEventListener('click', function() {
-                    if (data.invoices) invoices = data.invoices;
-                    if (data.customers) customers = data.customers;
-                    if (data.shipments) shipments = data.shipments;
-                    if (data.settings) {
-                        Object.assign(settings, data.settings);
-                        applyTheme();
-                        applyLanguage();
-                    }
-                    if (data.notifications) notifications = data.notifications;
-                    if (data.wishlist) wishlist = data.wishlist;
-                    if (data.notes) notes = data.notes;
-                    
-                    saveAllData();
-                    document.querySelectorAll('.modal').forEach(m => m.remove());
-                    showToast(t('dataImported'));
-                    if (typeof switchPage === 'function') switchPage('dashboard');
-                });
-                
-            } catch (error) {
-                showToast(lang === 'en' ? 'Invalid backup file' : 'ملف نسخة غير صالح');
-            }
-        };
-        reader.readAsText(file);
-    });
-}
+
 function handleCSVFile(file) {
     const reader = new FileReader();
     reader.onload = function(e) {
@@ -1531,3 +1435,27 @@ function handleCSVFile(file) {
     };
     reader.readAsText(file);
 }
+<<<<<<< HEAD
+=======
+
+async function toggleBiometric() {
+    if (!settings.biometricEnabled) {
+        const registered = await registerBiometric();
+        if (registered) {
+            settings.biometricEnabled = true;
+            saveSettings();
+            showToast('✅ تم تفعيل البصمة');
+        } else {
+            showToast('❌ فشل تفعيل البصمة');
+        }
+    } else {
+        settings.biometricEnabled = false;
+        settings.biometricId = '';
+        saveSettings();
+        showToast('تم تعطيل البصمة');
+    }
+    
+    document.querySelectorAll('.modal').forEach(m => m.remove());
+    openSecuritySettings();
+}
+>>>>>>> a423071 (v2.2.0)

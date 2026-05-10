@@ -564,46 +564,6 @@ body {
     border-bottom: none;
 }
 
-/* AI Chat */
-.ai-fab {
-    position: fixed;
-    bottom: 100px;
-    right: 20px;
-    width: 52px;
-    height: 52px;
-    background: var(--text);
-    color: var(--bg);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 150;
-    box-shadow: 0 4px 16px rgba(18, 26, 43, 0.3);
-    font-size: 22px;
-    transition: 0.2s;
-}
-
-.ai-fab:active {
-    transform: scale(0.9);
-}
-
-.ai-chat-window {
-    position: fixed;
-    bottom: 100px;
-    right: 20px;
-    width: 340px;
-    max-height: 450px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    display: none;
-    flex-direction: column;
-    z-index: 160;
-    box-shadow: 0 8px 32px rgba(18, 26, 43, 0.2);
-    overflow: hidden;
-}
-
 /* Quick Actions */
 .slider-container {
     display: flex;
@@ -859,7 +819,9 @@ select.form-control {
     align-items: center;
     justify-content: center;
 }
-
+@keyframes confettiFall { 
+    to { top: 110vh; transform: rotate(720deg); opacity: 0; } 
+}
 /*.floating-group input {
     width: 100%;
     padding: 16px 12px 8px 12px;

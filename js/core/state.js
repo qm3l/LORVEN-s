@@ -1,9 +1,15 @@
 // ==================== تعريف المتغيرات العامة (Global Variables) ====================
 // تأكد من تعريف هذه المتغيرات في البداية لتجنب أخطاء ReferenceError
+<<<<<<< HEAD
 var APP_VERSION = "1.1.0";
+=======
+var APP_VERSION = "1.2.0";
+>>>>>>> a423071 (v2.2.0)
 var isAppInitialized = false;
 var currentPage = 'dashboard';
 var loyaltyCodes = [];
+var soundEnabled = true;
+
 
 // كائنات البيانات الأساسية
 var settings = {
@@ -13,6 +19,11 @@ var settings = {
     currency: 'ر.س',
     countryCode: '967',
     codeBehavior: 'prepend',
+<<<<<<< HEAD
+=======
+    biometricEnabled: false,
+    biometricId: '',
+>>>>>>> a423071 (v2.2.0)
     whatsappTemplate: `✦ لــــورفــــن ✦
 ──────────────────
 
@@ -62,8 +73,15 @@ async function initApp() {
     
     console.log('⏳ Initializing LORVEN SYS...');
 
+<<<<<<< HEAD
     await initDatabase();
     loadData();
+=======
+    await initDatabase();  // ✅ أولاً: جهّز DB
+    loadData();            // ✅ ثانياً: حمّل كل البيانات (تتضمن loadSettings)
+    
+    console.log('اللغة بعد التحميل:', settings.language);
+>>>>>>> a423071 (v2.2.0)
     
     applyLanguage();
     applyTheme();
@@ -71,7 +89,6 @@ async function initApp() {
     isAppInitialized = true;
     console.log('✅ LORVEN SYS v' + APP_VERSION + ' initialized');
 }
-
 // تطبيق اللغة
 function applyLanguage() {
     let lang = settings.language || 'ar';
@@ -83,10 +100,13 @@ function applyLanguage() {
     document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
     
     // تحديث النصوص في الصفحة التي تحمل data-i18n
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        el.textContent = t(key);
-    });
+document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (window.i18n && window.i18n[lang] && window.i18n[lang][key]) {
+        el.textContent = window.i18n[lang][key];
+    }
+});
+    
 }
 
 // تطبيق الثيم (داكن/فاتح)
@@ -96,25 +116,6 @@ function applyTheme() {
         theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
     document.body.classList.toggle('dark-mode', theme === 'dark');
-}
-
-// نظام الترجمة المبسط
-function t(key) {
-    const lang = settings.language || 'ar';
-    const translations = {
-        'dashboard': { ar: 'الرئيسية', en: 'Dashboard' },
-        'invoices': { ar: 'الفواتير', en: 'Invoices' },
-        'customers': { ar: 'العملاء', en: 'Customers' },
-        'settings': { ar: 'الإعدادات', en: 'Settings' },
-        'save': { ar: 'حفظ', en: 'Save' },
-        'delete': { ar: 'حذف', en: 'Delete' }
-        // أضف بقية الكلمات هنا بنفس النمط
-    };
-    
-    if (translations[key]) {
-        return translations[key][lang] || key;
-    }
-    return key;
 }
 
 // ==================== دوال المساعدة العامة ====================
@@ -169,7 +170,8 @@ function switchPage(page) {
     const renderers = {
         'dashboard': typeof renderDashboard === 'function' ? renderDashboard : null,
         'customers': typeof renderCustomersPage === 'function' ? renderCustomersPage : null,
-        'invoices': typeof renderInvoicesPage === 'function' ? renderInvoicesPage : null
+        'invoices': typeof renderInvoicesPage === 'function' ? renderInvoicesPage : null,
+        'debts': typeof renderDebtsPage === 'function' ? renderDebtsPage : null
     };
 
     if (renderers[page]) {
@@ -279,6 +281,7 @@ function addNotification(type, title, message, refId) {
     
     if (notifications.length > 100) notifications.pop();
     saveNotifications();
+    playSound('notification');
     
     if (typeof updateNotificationBadge === 'function') updateNotificationBadge();
 }
@@ -437,26 +440,6 @@ function openNotification(refId, type) {
     }
 }
 
-// دالة حفظ الملاحظات
-function saveNotes() {
-    localStorage.setItem('lorvenNotes', JSON.stringify(notes));
-}
-
-function loadNotes() {
-    const stored = localStorage.getItem('lorvenNotes');
-    notes = stored ? JSON.parse(stored) : [];
-}
-
-// دالة تحميل الإعدادات المفقودة
-function loadSettings() {
-    const stored = localStorage.getItem('lorvenSettings');
-    if (stored) {
-        try {
-            const parsed = JSON.parse(stored);
-            Object.assign(settings, parsed);
-        } catch(e) {}
-    }
-}
 function showConfirmModal(message, onConfirm) {
     const lang = settings.language;
     
@@ -534,6 +517,29 @@ async function pickContact() {
     } catch (err) {
         console.log('Contact picker error:', err);
     }
+}
+
+function addNotification(type, title, message, refId) {
+    notifications.unshift({
+        id: Date.now() + '-' + Math.random().toString(36).substr(2, 6),
+        type: type, title: title, message: message, refId: refId,
+        read: false, createdAt: new Date().toISOString()
+    });
+    
+    if (notifications.length > 100) notifications.pop();
+    saveNotifications();
+    if (typeof updateNotificationBadge === 'function') updateNotificationBadge();
+    
+    // ✅ إرسال Push Notification
+    fetch('/api/send-notification', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        title: title,
+        body: message,
+        token: settings.fcmToken || ''
+    })
+}).catch(function() {});
 }
 
 function generateLoyaltyCode(customerName) {
@@ -628,14 +634,29 @@ function redeemLoyaltyPoints(customerId) {
     return discount;
 }
 
-function saveLoyaltyCodes() {
-    localStorage.setItem('lorvenLoyaltyCodes', JSON.stringify(loyaltyCodes));
+function getCurrentYear() {
+    return new Date().getFullYear();
 }
 
-function loadLoyaltyCodes() {
-    const stored = localStorage.getItem('lorvenLoyaltyCodes');
-    loyaltyCodes = stored ? JSON.parse(stored) : [];
+var lockTimer = null;
+
+function resetLockTimer() {
+    if (settings.appLock !== 'on') return;
+    if (lockTimer) clearTimeout(lockTimer);
+    lockTimer = setTimeout(function() {
+        if (typeof showLockScreen === 'function') {
+            showLockScreen();
+        }
+    }, 30000);
 }
 
+<<<<<<< HEAD
 // استدعاء أولي عند التحميل
 console.log('✅ State Manager Loaded');
+=======
+document.addEventListener('click', resetLockTimer);
+document.addEventListener('keypress', resetLockTimer);
+document.addEventListener('scroll', resetLockTimer);
+
+console.log('✅ State Manager Loaded');
+>>>>>>> a423071 (v2.2.0)

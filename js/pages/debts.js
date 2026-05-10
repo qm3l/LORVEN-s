@@ -49,13 +49,17 @@ function renderDebtsPage(container) {
     
     if (debtList.length === 0) {
         html += `
-            <div style="text-align: center; padding: 40px; color: var(--text-soft);">
+            <div style="text-align: center; padding-top: 20vh; color: var(--text-soft);">
                 <i class="fas fa-check-circle" style="font-size: 48px; color: var(--green); margin-bottom: 12px;"></i>
-                <p>${lang === 'en' ? 'No pending debts' : 'لا يوجد ديون معلقة'} </p>
+                <p>${lang === 'en' ? 'No pending debts' : 'لا يوجد ديون معلقة'}</p>
             </div>
         `;
     } else {
         debtList.forEach((c, idx) => {
+            const escapedName = c.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            const escapedPhone = c.phone.replace(/'/g, "\\'");
+            const customerId = c.invoices[0]?.customerId || '';
+            
             html += `
                 <div class="stat-card" style="margin-bottom: 6px;">
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
@@ -70,23 +74,23 @@ function renderDebtsPage(container) {
                         </div>
                     </div>
                     
-                    <!-- آخر فاتورتين -->
                     ${c.invoices.slice(-2).reverse().map(inv => `
                         <div style="font-size: 10px; color: var(--text-soft); padding: 2px 0; cursor: pointer;" onclick="viewInvoiceDetails('${inv.id}')">
                             · ${inv.id}: ${formatCurrency(inv.remainingAmount)} ${lang === 'en' ? 'remaining' : 'متبقي'} · ${formatDate(inv.date)}
                         </div>
                     `).join('')}
                     
-                    <!-- أزرار الإجراء -->
                     <div style="display: flex; gap: 4px; margin-top: 6px;">
                         ${c.phone ? `
-                            <button class="btn btn-wa" style="flex: 1; padding: 6px; font-size: 10px;" onclick="sendDebtReminder('${c.phone}', '${escapeHTML(c.name)}', ${c.totalDebt})">
+                            <button class="btn btn-wa" style="flex: 1; padding: 6px; font-size: 10px;" onclick="sendDebtReminder('${escapedPhone}', '${escapedName}', ${c.totalDebt})">
                                 <i class="fab fa-whatsapp"></i> ${lang === 'en' ? 'Remind' : 'تذكير'}
                             </button>
                         ` : ''}
-                        <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 10px;" onclick="viewCustomer('${c.invoices[0]?.customerId || ''}')">
-                            <i class="fas fa-user"></i> ${lang === 'en' ? 'Profile' : 'ملف'}
-                        </button>
+                        ${customerId ? `
+                            <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 10px;" onclick="viewCustomerDetails('${customerId}')">
+                                <i class="fas fa-user"></i> ${lang === 'en' ? 'Profile' : 'ملف'}
+                            </button>
+                        ` : ''}
                     </div>
                 </div>
             `;
@@ -97,16 +101,19 @@ function renderDebtsPage(container) {
 }
 
 function sendDebtReminder(phone, name, amount) {
-    const lang = settings.language;
+    const lang = (settings && settings.language) ? settings.language : 'ar';
+    const countryCode = (settings && settings.countryCode) ? settings.countryCode : '967';
+    const codeBehavior = (settings && settings.codeBehavior) ? settings.codeBehavior : 'prepend';
+    
     let number = phone.replace(/\D/g, '');
     
     const message = lang === 'en' 
         ? `Hello ${name},\n\nI hope this message finds you well.\n\nThis is a polite reminder that you have a balance of ${formatCurrency(amount)} remaining on your account.\n\nWe kindly request you to settle it at your earliest convenience.\n\nThank you for your trust and understanding 🤍\n- LORVEN`
-        : `السلام عليكم ورحمة الله وبركاته 🌸\n\nعزيزتي ${name}،\n\nنأمل أن تصلك هذه الرسالة وأنتي بأتم الصحة والعافية.\n\nنود تذكيرك بأنه لا يزال لديك مبلغ وقدره ${formatCurrency(amount)} متبقي في سجلاتنا.\n\nنرجو منك التكرم بتسديده في أقرب وقت ممكن، ويسعدنا خدمتك دائماً.\n\nمع خالص الشكر والتقدير 🤍\n- لورفين`;
+        : `السلام عليكم ورحمة الله وبركاته 🌸\n\nعزيزتي ${name}،\n\nنأمل أن تصلك هذه الرسالة وأنتي بأتم الصحة والعافية.\n\nنود تذكيرك بأنه لا يزال لديك مبلغ وقدره ${formatCurrency(amount)} متبقي في سجلاتنا.\n\nنرجو منك التكرم بتسديده في أقرب وقت ممكن، ويسعدنا خدمتك دائماً.\n\nمع خالص الشكر والتقدير 🤍\n- لورفن`;
     
-    if (settings.codeBehavior === 'prepend') {
+    if (codeBehavior === 'prepend') {
         if (number.startsWith('0')) number = number.substring(1);
-        number = settings.countryCode + number;
+        number = countryCode + number;
     }
     
     window.open(`https://wa.me/${number}?text=${encodeURIComponent(message)}`, '_blank');

@@ -43,7 +43,7 @@ function renderNotesList() {
     
     if (notes.length === 0) {
         container.innerHTML = `
-            <div style="text-align: center; padding: 40px; color: var(--text-soft);">
+            <div style="text-align: center; padding-top: 30vh; color: var(--text-soft);">
                 <i class="fas fa-sticky-note" style="font-size: 48px; margin-bottom: 12px; opacity: 0.3;"></i>
                 <p>${lang === 'en' ? 'No notes yet' : 'لا توجد ملاحظات'}</p>
             </div>
@@ -163,6 +163,7 @@ function deleteNoteFromModal(noteId) {
                 saveNotes();
                 renderNotesList();
                 showToast(t('deleted'));
+                playSound('delete');
             }
         );
     }, 200);

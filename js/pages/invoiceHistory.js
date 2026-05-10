@@ -37,9 +37,10 @@ function renderInvoiceHistoryList(filter = '') {
     
     if (sorted.length === 0) {
         container.innerHTML = `
-            <div style="text-align: center; padding: 40px; color: var(--text-soft);">
-                <p>${lang === 'en' ? 'No invoices found' : 'لا توجد فواتير'}</p>
-            </div>
+<div style="text-align: center; padding-top: 20vh; color: var(--text-soft);">
+    <i class="fas fa-ban" style="font-size: 64px; opacity: 0.3; margin-bottom: 16px; display: block;"></i>
+    <p>${lang === 'en' ? 'No invoices found' : 'لا توجد فواتير'}</p>
+</div>
         `;
         return;
     }

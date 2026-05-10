@@ -3,9 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script src="js/lib/xlsx.full.min.js"></script>
     <title id="dynamicTitle">LORVEN SYS</title>
    
+<script src="https://www.gstatic.com/firebasejs/12.12.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.12.1/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging-compat.js"></script>
+
+<script>
+    firebase.initializeApp({
+        apiKey: "AIzaSyCyPz0BM92T6fuiEnPRHUinR0IY1MNOP7s",
+        authDomain: "lorven-sys.firebaseapp.com",
+        projectId: "lorven-sys",
+        storageBucket: "lorven-sys.firebasestorage.app",
+        messagingSenderId: "634746871212",
+        appId: "1:634746871212:web:a64826474f26fe48132e09"
+    });
+</script>
+
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,7 +30,13 @@
     
     <!-- Icons -->
     <link rel="stylesheet" href="css/all.min.css">
+<<<<<<< HEAD
     
+=======
+
+    <script src="js/lib/crypto-js.min.js"></script>
+
+>>>>>>> a423071 (v2.2.0)
     <!-- Charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
@@ -31,6 +54,10 @@
 
     <script src="js/jspdf.umd.min.js"></script>
 
+<<<<<<< HEAD
+=======
+    <script src="js/lib/jspdf.umd.min.js"></script>
+>>>>>>> a423071 (v2.2.0)
 </head>
 <body>
     <div class="app-container">
@@ -39,34 +66,94 @@
 
         <div class="bottom-nav" id="bottomNav">
             <button class="nav-btn" onclick="switchPage('dashboard')"><i class="fas fa-home"></i><span data-i18n="home">الرئيسية</span></button>
-            <button class="nav-btn" onclick="switchPage('products')"><i class="fas fa-box"></i><span data-i18n="products">المنتجات</span></button>
             <button class="nav-btn" onclick="switchPage('invoices')"><i class="fas fa-receipt"></i><span data-i18n="invoices">الفواتير</span></button>
             <button class="nav-btn" onclick="switchPage('reports')"><i class="fas fa-chart-pie"></i><span data-i18n="reports">التقارير</span></button>
             <button class="nav-btn" onclick="switchPage('settings')"><i class="fas fa-cog"></i><span data-i18n="settings">الإعدادات</span></button>
         </div>
     </div>
 
-    <div class="toast" id="toast">لورڤين 🌸</div>
+    <div class="toast" id="toast">لورفين 🌸</div>
         </div>
 
+<div id="splashScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(145deg,#121A2B,#3A4A66);display:flex;align-items:center;justify-content:center;z-index:99999;transition:opacity 0.5s;">
+    <div style="text-align:center;">
+<img src="img/logo.png" style="width:300px;height:300px;border-radius:24px;object-fit:cover;animation:logoMove 1s ease-in-out infinite;">        <h1 style="color:white;font-size:32px;font-weight:800;letter-spacing:6px;margin-top:16px;font-family:'Cairo', sans-serif;">LORVEN</h1>
+    </div>
+</div>
+
+<style>
+@keyframes logoMove {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+</style>
+
+<script>
+setTimeout(function(){
+    var splash = document.getElementById('splashScreen');
+    splash.style.opacity = '0';
+    setTimeout(function(){ splash.remove(); }, 500);
+}, 2000);
+</script>
     <!-- Service Worker -->
-    <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-          .then(registration => {
-            console.log('✅ ServiceWorker registered');
-          })
-          .catch(error => {
-            console.log('❌ ServiceWorker registration failed:', error);
-          });
-      });
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    try {
+
+      const reg = await navigator.serviceWorker.register('firebase-messaging-sw.js');
+      console.log('✅ ServiceWorker registered');
+
+
+      if (typeof messaging !== 'undefined') {
+        messaging.useServiceWorker(reg);
+      }
+    } catch (error) {
+      console.log('❌ Registration failed:', error);
     }
+<<<<<<< HEAD
     </script>
     
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js";
+=======
+  });
+}
+</script>
+
+<script type="module">
+  const vapidKey = "BKBWXXjIqX1Wqhozgz7pX2w1-ou-KzK51oJkYcF833wezyvZEFMU4HYr7UQOHLn693jg6QrQvcv7FWhfRPrEdKw"; 
+
+  async function getTokenNow() {
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const messaging = firebase.messaging();
+      
+      const currentToken = await messaging.getToken({ 
+        vapidKey: vapidKey,
+        serviceWorkerRegistration: reg 
+      });
+
+      if (currentToken) {
+        console.log("✅ SUCCESS! Your Token is:");
+        console.log(currentToken);
+        settings.fcmToken = token;
+        saveSettings();
+      } else {
+        console.log('❌ No token available. Check permissions.');
+      }
+    } catch (err) {
+      console.log('❌ Error getting token:', err);
+    }
+  }
+
+  setTimeout(getTokenNow, 2000); 
+</script>
+
+
+
+>>>>>>> a423071 (v2.2.0)
 
 const firebaseConfig = {
   apiKey: "AIzaSyCyPz0BM92T6fuiEnPRHUinR0IY1MNOP7s",
@@ -109,6 +196,7 @@ onMessage(messaging, (payload) => {
 </script>
     
     <!-- JavaScript Files -->
+<script src="js/lib/sql-wasm.js"></script>
     <script src="js/core/state.js"></script>
     <script src="js/core/i18n.js"></script>
     <script src="js/core/data.js"></script>
@@ -117,6 +205,7 @@ onMessage(messaging, (payload) => {
     <script src="js/jspdf.umd.min.js"></script>
 
     <script src="js/system/auth.js"></script>
+    <script src="js/system/biometric.js"></script>
     <script src="js/system/import.js"></script>
     <script src="js/system/backup.js"></script>
     <script src="js/system/clearData.js"></script>
@@ -139,7 +228,6 @@ onMessage(messaging, (payload) => {
     <script src="js/pages/suppliers.js"></script>
     <script src="js/pages/reports.js"></script>
     <script src="js/pages/settings.js"></script>
-    <script src="js/system/sound.js"></script>
 
     <script src="js/core/ui.js"></script>
     <script src="js/main.js"></script>

@@ -4,35 +4,20 @@
 function renderReportsPage(container) {
     const lang = settings.language;
     
-    // حساب الإحصائيات
     const totalSales = invoices.reduce((s, i) => s + (i.total || 0), 0);
     const totalProfit = invoices.reduce((s, i) => s + (i.profit || 0), 0);
     const totalInvoicesCount = invoices.length;
     const totalCustomers = customers.length;
     const avgOrder = totalInvoicesCount > 0 ? (totalSales / totalInvoicesCount) : 0;
-    
-    // المدفوع والمتبقي
     const totalPaid = invoices.reduce((s, i) => s + (i.paidAmount || 0), 0);
     const totalRemaining = invoices.reduce((s, i) => s + (i.remainingAmount || 0), 0);
-    
-    // الديون (فواتير غير مدفوعة)
     const unpaidInvoices = invoices.filter(i => i.remainingAmount > 0 && i.paymentStatus !== 'paid');
     const totalDebt = unpaidInvoices.reduce((s, i) => s + (i.remainingAmount || 0), 0);
-    
-    // فواتير غير مرسلة
     const unsentInvoices = invoices.filter(i => !i.whatsappSent);
-    
-    // الشحنات
     const activeShipments = shipments.filter(s => s.status === 'collecting' || s.status === 'sent_to_supplier' || s.status === 'in_transit');
     const completedShipments = shipments.filter(s => s.status === 'arrived' || s.status === 'delivered');
-    
-    // البوكسات الأكثر مبيعاً
     const topBundles = [...bundles].sort((a, b) => (b.salesCount || 0) - (a.salesCount || 0)).slice(0, 5);
-    
-    // العملاء الأكثر شراءً
     const topCustomers = [...customers].sort((a, b) => (b.purchaseCount || 0) - (a.purchaseCount || 0)).slice(0, 5);
-    
-    // المعارض حسب الشحنات
     const topSuppliers = [...suppliers].sort((a, b) => (b.totalItems || 0) - (a.totalItems || 0)).slice(0, 5);
     
     let html = `
@@ -40,154 +25,86 @@ function renderReportsPage(container) {
             <i class="fas fa-chart-pie"></i> ${lang === 'en' ? 'Reports' : 'التقارير'}
         </h3>
         
-        <!-- إجمالي المبيعات -->
         <div class="stat-card" style="margin-bottom: 10px; text-align: center;">
             <div style="font-size: 11px; color: var(--text-soft); margin-bottom: 4px;">${lang === 'en' ? 'Total Sales' : 'إجمالي المبيعات'}</div>
-            <div style="font-size: 28px; font-weight: 800;">${formatCurrency(totalSales)}</div>
+            <div class="count-up" data-target="${totalSales}" style="font-size: 28px; font-weight: 800;">0</div>
         </div>
         
-        <!-- شبكة إحصائيات -->
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 12px;">
             <div class="stat-card" style="text-align: center;">
-                <div style="font-size: 18px; font-weight: 800;">${formatCurrency(totalProfit)}</div>
+                <div class="count-up" data-target="${totalProfit}" style="font-size: 18px; font-weight: 800;">0</div>
                 <div style="font-size: 10px; color: var(--text-soft);">${lang === 'en' ? 'Net Profit' : 'صافي الربح'}</div>
             </div>
             <div class="stat-card" style="text-align: center;">
-                <div style="font-size: 18px; font-weight: 800;">${totalInvoicesCount}</div>
+                <div class="count-up" data-target="${totalInvoicesCount}" style="font-size: 18px; font-weight: 800;">0</div>
                 <div style="font-size: 10px; color: var(--text-soft);">${lang === 'en' ? 'Invoices' : 'فواتير'}</div>
             </div>
             <div class="stat-card" style="text-align: center;">
-                <div style="font-size: 18px; font-weight: 800;">${formatCurrency(avgOrder)}</div>
+                <div class="count-up" data-target="${avgOrder}" style="font-size: 18px; font-weight: 800;">0</div>
                 <div style="font-size: 10px; color: var(--text-soft);">${lang === 'en' ? 'Avg. Order' : 'متوسط الفاتورة'}</div>
             </div>
             <div class="stat-card" style="text-align: center;">
-                <div style="font-size: 18px; font-weight: 800;">${totalCustomers}</div>
+                <div class="count-up" data-target="${totalCustomers}" style="font-size: 18px; font-weight: 800;">0</div>
                 <div style="font-size: 10px; color: var(--text-soft);">${lang === 'en' ? 'Customers' : 'عميلة'}</div>
             </div>
         </div>
         
-        <!-- مدفوعات وديون -->
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 12px;">
             <div class="stat-card" style="text-align: center; border: 1px solid var(--green);">
-                <div style="font-size: 18px; font-weight: 800; color: var(--green);">${formatCurrency(totalPaid)}</div>
+                <div class="count-up" data-target="${totalPaid}" style="font-size: 18px; font-weight: 800; color: var(--green);">0</div>
                 <div style="font-size: 10px; color: var(--text-soft);">${lang === 'en' ? 'Total Paid' : 'المدفوع'}</div>
             </div>
             <div class="stat-card" style="text-align: center; border: 1px solid var(--orange);">
-                <div style="font-size: 18px; font-weight: 800; color: var(--orange);">${formatCurrency(totalDebt)}</div>
+                <div class="count-up" data-target="${totalDebt}" style="font-size: 18px; font-weight: 800; color: var(--orange);">0</div>
                 <div style="font-size: 10px; color: var(--text-soft);">${lang === 'en' ? 'Pending Debts' : 'ديون معلقة'}</div>
             </div>
         </div>
         
-        <!-- الشحنات -->
         <div style="margin-bottom: 12px;">
             <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 6px;">
                 <i class="fas fa-truck"></i> ${lang === 'en' ? 'Shipments' : 'الشحنات'}
             </h4>
             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;">
                 <div class="stat-card" style="text-align: center;">
-                    <div style="font-size: 18px; font-weight: 800;">${activeShipments.length}</div>
+                    <div class="count-up" data-target="${activeShipments.length}" style="font-size: 18px; font-weight: 800;">0</div>
                     <div style="font-size: 10px; color: var(--text-soft);">${lang === 'en' ? 'Active' : 'نشطة'}</div>
                 </div>
                 <div class="stat-card" style="text-align: center;">
-                    <div style="font-size: 18px; font-weight: 800;">${completedShipments.length}</div>
+                    <div class="count-up" data-target="${completedShipments.length}" style="font-size: 18px; font-weight: 800;">0</div>
                     <div style="font-size: 10px; color: var(--text-soft);">${lang === 'en' ? 'Completed' : 'مكتملة'}</div>
                 </div>
             </div>
         </div>
     `;
     
-    // تنبيهات سريعة
     if (unsentInvoices.length > 0 || unpaidInvoices.length > 0) {
         html += `
             <div style="margin-bottom: 12px; background: var(--card); border-radius: 16px; padding: 10px 14px; border: 1px solid var(--border);">
                 <div style="font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--orange);">
                     <i class="fas fa-exclamation-triangle"></i> ${lang === 'en' ? 'Needs Attention' : 'تحتاج انتباه'}
                 </div>
-                ${unsentInvoices.length > 0 ? `
-                    <div style="font-size: 11px; color: var(--text-soft); padding: 2px 0;">
-                        · ${unsentInvoices.length} ${lang === 'en' ? 'invoices not sent' : 'فواتير غير مرسلة'}
-                    </div>
-                ` : ''}
-                ${unpaidInvoices.length > 0 ? `
-                    <div style="font-size: 11px; color: var(--text-soft); padding: 2px 0;">
-                        · ${unpaidInvoices.length} ${lang === 'en' ? 'unpaid invoices' : 'فواتير غير مدفوعة'}
-                    </div>
-                ` : ''}
+                ${unsentInvoices.length > 0 ? `<div style="font-size: 11px; color: var(--text-soft);">· ${unsentInvoices.length} ${lang === 'en' ? 'invoices not sent' : 'فواتير غير مرسلة'}</div>` : ''}
+                ${unpaidInvoices.length > 0 ? `<div style="font-size: 11px; color: var(--text-soft);">· ${unpaidInvoices.length} ${lang === 'en' ? 'unpaid invoices' : 'فواتير غير مدفوعة'}</div>` : ''}
             </div>
         `;
     }
     
-    // أعلى العملاء
     if (topCustomers.length > 0) {
-        html += `
-            <div style="margin-bottom: 12px;">
-                <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 6px;">
-                    <i class="fas fa-users"></i> ${lang === 'en' ? 'Top Customers' : 'أعلى العملاء'}
-                </h4>
-                ${topCustomers.map((c, idx) => `
-                    <div class="stat-card" style="margin-bottom: 4px; cursor: pointer;" onclick="viewCustomer('${c.id}')">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="font-size: 12px; color: var(--text-soft);">${idx + 1}.</span>
-                            <div style="width: 8px; height: 8px; border-radius: 50%; background: ${getCustomerTierColor(c.tier)};"></div>
-                            <span style="font-weight: 600; font-size: 12px; flex: 1;">${escapeHTML(c.name)}</span>
-                            <span style="font-size: 11px; color: var(--text-soft);">${c.purchaseCount || 0} ${lang === 'en' ? 'orders' : 'طلب'} · ${formatCurrency(c.totalSpent || 0)}</span>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        `;
+        html += `<div style="margin-bottom: 12px;"><h4 style="font-size: 14px; font-weight: 700; margin-bottom: 6px;"><i class="fas fa-users"></i> ${lang === 'en' ? 'Top Customers' : 'أعلى العملاء'}</h4>${topCustomers.map((c, idx) => `<div class="stat-card" style="margin-bottom: 4px; cursor: pointer;" onclick="viewCustomer('${c.id}')"><div style="display: flex; align-items: center; gap: 8px;"><span style="font-size: 12px; color: var(--text-soft);">${idx + 1}.</span><div style="width: 8px; height: 8px; border-radius: 50%; background: ${getCustomerTierColor(c.tier)};"></div><span style="font-weight: 600; font-size: 12px; flex: 1;">${escapeHTML(c.name)}</span><span style="font-size: 11px; color: var(--text-soft);">${c.purchaseCount || 0} ${lang === 'en' ? 'orders' : 'طلب'} · ${formatCurrency(c.totalSpent || 0)}</span></div></div>`).join('')}</div>`;
     }
     
-    // أعلى البوكسات
     if (topBundles.length > 0) {
-        html += `
-            <div style="margin-bottom: 12px;">
-                <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 6px;">
-                    <i class="fas fa-cube"></i> ${lang === 'en' ? 'Top Boxes' : 'أعلى البوكسات مبيعاً'}
-                </h4>
-                ${topBundles.map((b, idx) => `
-                    <div class="stat-card" style="margin-bottom: 4px;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="font-size: 12px; color: var(--text-soft);">${idx + 1}.</span>
-                            <span style="font-weight: 600; font-size: 12px; flex: 1;">${escapeHTML(b.name)}</span>
-                            <span style="font-size: 11px; color: var(--text-soft);">${b.salesCount || 0} ${lang === 'en' ? 'sold' : 'تم بيعه'}</span>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        `;
+        html += `<div style="margin-bottom: 12px;"><h4 style="font-size: 14px; font-weight: 700; margin-bottom: 6px;"><i class="fas fa-cube"></i> ${lang === 'en' ? 'Top Boxes' : 'أعلى البوكسات مبيعاً'}</h4>${topBundles.map((b, idx) => `<div class="stat-card" style="margin-bottom: 4px;"><div style="display: flex; align-items: center; gap: 8px;"><span style="font-size: 12px; color: var(--text-soft);">${idx + 1}.</span><span style="font-weight: 600; font-size: 12px; flex: 1;">${escapeHTML(b.name)}</span><span style="font-size: 11px; color: var(--text-soft);">${b.salesCount || 0} ${lang === 'en' ? 'sold' : 'تم بيعه'}</span></div></div>`).join('')}</div>`;
     }
     
-    // أعلى المعارض
     if (topSuppliers.length > 0) {
-        html += `
-            <div style="margin-bottom: 12px;">
-                <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 6px;">
-                    <i class="fas fa-store"></i> ${lang === 'en' ? 'Top Suppliers' : 'أداء المعارض'}
-                </h4>
-                ${topSuppliers.map((s, idx) => `
-                    <div class="stat-card" style="margin-bottom: 4px; cursor: pointer;" onclick="viewSupplier('${s.id}')">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="font-size: 12px; color: var(--text-soft);">${idx + 1}.</span>
-                            <span style="font-weight: 600; font-size: 12px; flex: 1;">${escapeHTML(s.name)}</span>
-                            <span style="font-size: 11px; color: var(--text-soft);">${s.totalItems || 0} ${lang === 'en' ? 'items' : 'منتج'}</span>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        `;
+        html += `<div style="margin-bottom: 12px;"><h4 style="font-size: 14px; font-weight: 700; margin-bottom: 6px;"><i class="fas fa-store"></i> ${lang === 'en' ? 'Top Suppliers' : 'أداء المعارض'}</h4>${topSuppliers.map((s, idx) => `<div class="stat-card" style="margin-bottom: 4px; cursor: pointer;" onclick="viewSupplier('${s.id}')"><div style="display: flex; align-items: center; gap: 8px;"><span style="font-size: 12px; color: var(--text-soft);">${idx + 1}.</span><span style="font-weight: 600; font-size: 12px; flex: 1;">${escapeHTML(s.name)}</span><span style="font-size: 11px; color: var(--text-soft);">${s.totalItems || 0} ${lang === 'en' ? 'items' : 'منتج'}</span></div></div>`).join('')}</div>`;
     }
     
-    // أزرار التصدير
-    html += `
-        <div style="display: flex; gap: 8px; margin-top: 16px;">
-           <button class="btn btn-outline" style="padding: 10px 14px; font-size: 15px;" onclick="exportReportAsPDF()">
-    <i class="fas fa-file-pdf"></i> ${lang === 'en' ? 'PDF' : 'PDF'}
-</button>
-           </div>
-    `;
+    html += `<div style="display: flex; gap: 8px; margin-top: 16px;"><button class="btn btn-outline" style="padding: 10px 14px; font-size: 15px;" onclick="exportReportAsPDF()"><i class="fas fa-file-pdf"></i> ${lang === 'en' ? 'PDF' : 'PDF'}</button></div>`;
     html += '<div style="height: 70px;"></div>';
     container.innerHTML = html;
+    setTimeout(animateCounters, 100);
 }
 
 function sendAllUnsentInvoices() {

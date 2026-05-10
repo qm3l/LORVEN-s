@@ -107,62 +107,6 @@ function confirmImport() {
     importFileData = null;
 }
 
-function importProducts(rows) {
-    const lang = settings.language;
-    let added = 0;
-    let skipped = 0;
-    let errors = [];
-    
-    rows.forEach((row, index) => {
-        try {
-            const name = (row[0] || '').toString().trim();
-            const price = parseFloat(row[1]) || 0;
-            const category = (row[2] || '').toString().trim() || (lang === 'en' ? 'General' : 'منتجات عامة');
-            
-            if (!name) {
-                skipped++;
-                errors.push(`${lang === 'en' ? 'Row' : 'الصف'} ${index + 2}: ${lang === 'en' ? 'Product name required' : 'اسم المنتج مطلوب'}`);
-                return;
-            }
-            
-            if (price <= 0) {
-                skipped++;
-                errors.push(`${lang === 'en' ? 'Row' : 'الصف'} ${index + 2}: ${lang === 'en' ? 'Price must be greater than 0' : 'السعر يجب أن يكون أكبر من 0'}`);
-                return;
-            }
-            
-            // إضافة للـ wishlist
-            const exists = wishlist.find(w => w.name.toLowerCase() === name.toLowerCase());
-            if (!exists) {
-                wishlist.push({
-                    id: 'W-' + Date.now() + '-' + Math.random().toString(36).substring(2, 5),
-                    name: name,
-                    price: price,
-                    category: category,
-                    addedDate: new Date().toISOString()
-                });
-                added++;
-            } else {
-                skipped++;
-            }
-        } catch (error) {
-            errors.push(`${lang === 'en' ? 'Row' : 'الصف'} ${index + 2}: ${lang === 'en' ? 'Read error' : 'خطأ في القراءة'}`);
-        }
-    });
-    
-    if (added > 0) {
-        saveWishlist();
-    }
-    
-    let message = `✅ ${lang === 'en' ? 'Imported' : 'تم استيراد'} ${added} ${lang === 'en' ? 'products' : 'منتج'}`;
-    if (skipped > 0) message += `، ${lang === 'en' ? 'skipped' : 'تم تخطي'} ${skipped}`;
-    showToast(message);
-    
-    if (errors.length > 0) {
-        console.warn('Import errors:', errors);
-    }
-}
-
 function importInvoices(rows) {
     const lang = settings.language;
     let added = 0;

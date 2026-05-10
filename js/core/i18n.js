@@ -209,7 +209,7 @@ const i18n = {
         logoutDesc: 'قفل التطبيق والعودة لشاشة الدخول',
         confirmLogout: 'هل أنت متأكد من تسجيل الخروج؟',
         loggedOut: 'تم تسجيل الخروج',
-        aiAssistantTitle: 'مساعد لورفين الذكي',
+        aiAssistantTitle: 'مساعد لورفن الذكي',
         aiInputPlaceholder: 'اكتب سؤالك هنا...',
         communication: 'التواصل',
         dataAndSecurity: 'البيانات والأمان',
@@ -219,6 +219,7 @@ const i18n = {
         clearData: 'مسح البيانات',
 notifications: 'الإشعارات',
 notes: 'الملاحظات',
+        debts:'الديون',
 invoiceHistory: 'سجل الفواتير',
     },
     
@@ -438,6 +439,7 @@ invoiceHistory: 'سجل الفواتير',
         clearData: 'Clear Data',
 notifications: 'Notifications',
 notes: 'Notes', 
+        debts: 'Debts',
 invoiceHistory: 'Invoice History',
     }
 };

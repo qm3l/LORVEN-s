@@ -256,11 +256,11 @@ function openCodeSettingsModal(customerId) {
                 </div>
                 
                 <div style="display: flex; gap: 8px; margin-top: 16px;">
+                                    <button class="btn btn-outline" style="flex: 1;" onclick="this.closest('.modal').remove()">
+                        ${lang === 'en' ? 'Cancel' : 'إلغاء'}
+                    </button>
                     <button class="btn btn-primary" style="flex: 1;" onclick="finalizeCreateCode('${customerId || ''}')">
                         <i class="fas fa-check"></i> ${lang === 'en' ? 'Create Code' : 'إنشاء الكود'}
-                    </button>
-                    <button class="btn btn-outline" style="flex: 1;" onclick="this.closest('.modal').remove()">
-                        ${lang === 'en' ? 'Cancel' : 'إلغاء'}
                     </button>
                 </div>
             </div>
@@ -385,6 +385,7 @@ function deleteLoyaltyCode(codeId) {
         saveLoyaltyCodes();
         document.querySelectorAll('.modal').forEach(m => m.remove());
         showToast(lang === 'en' ? 'Code deleted' : 'تم مسح الكود');
+        playSound('delete');
         if (currentPage === 'loyalty') renderLoyaltyPage(document.getElementById('mainContent'));
     };
 }

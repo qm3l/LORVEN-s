@@ -105,6 +105,13 @@ function showLockScreen() {
                     <i class="fas fa-eye"></i>
                 </span>
             </div>
+            ${settings.biometricEnabled ? `
+    <button id="biometricUnlockBtn" style="
+        width: 100%; padding: 12px; background: #F8F4F0; border: 2px solid #E0D6D0; border-radius: 30px;
+        font-weight: 600; color: #243048; cursor: pointer; margin-bottom: 10px;
+        font-family: inherit; font-size: 13px;
+    "><i class="fas fa-fingerprint" style="margin-left: 5px; font-size: 16px;"></i> ${lang === 'en' ? 'Biometric Unlock' : 'فتح بالبصمة'}</button>
+` : ''}
             
             <button id="unlockBtn" style="
                 width: 100%; padding: 14px; background: #243048; border: none; border-radius: 30px; 
@@ -121,7 +128,7 @@ function showLockScreen() {
             
             <!-- الحقوق والإصدار -->
             <div style="margin-top: 20px; text-align: center;">
-                <p style="color: #B0A8A0; font-size: 10px; margin: 0 0 2px;">© 2025 LORVEN</p>
+                <p style="color: #B0A8A0; font-size: 10px; margin: 0 0 2px;">© ${new Date().getFullYear()} LORVEN</p>
                 <p style="color: #C8C0B8; font-size: 9px; margin: 0;">v${APP_VERSION}</p>
             </div>
         </div>
@@ -172,6 +179,22 @@ function showLockScreen() {
     
     // تركيز و Enter
     setTimeout(() => document.getElementById('pinInput').focus(), 100);
+
+            if (settings.biometricEnabled) {
+    document.getElementById('biometricUnlockBtn').addEventListener('click', async function() {
+        const verified = await verifyBiometric();
+        if (verified) {
+            lockAttempts = 0;
+            document.getElementById('pinScreen')?.remove();
+            document.querySelector('.app-container').style.display = 'flex';
+            if (typeof switchPage === 'function') switchPage('dashboard');
+        } else {
+            const errorEl = document.getElementById('pinError');
+            errorEl.textContent = lang === 'en' ? 'Biometric failed' : 'فشلت البصمة';
+            errorEl.style.display = 'block';
+        }
+    });
+}
     document.getElementById('pinInput').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') checkPinCode();
     });
@@ -199,8 +222,8 @@ function checkPinCode() {
         return;
     }
     
-    if (pin === savedPin) {
-        lockAttempts = 0;
+if (String(pin) === String(savedPin)) {
+    lockAttempts = 0;
         document.getElementById('pinScreen')?.remove();
         document.querySelector('.app-container').style.display = 'flex';
         if (typeof switchPage === 'function') switchPage('dashboard');
@@ -264,7 +287,7 @@ function showForgotPinForm() {
             <div id="forgotError" style="color: #FF6B6B; font-size: 12px; margin-top: 8px; display: none;"></div>
             
             <div style="margin-top: 20px; text-align: center;">
-                <p style="color: #B0A8A0; font-size: 10px; margin: 0 0 2px;">© 2025 LORVEN</p>
+                <p style="color: #B0A8A0; font-size: 10px; margin: 0 0 2px;">© ${new Date().getFullYear()} LORVEN</p>
                 <p style="color: #C8C0B8; font-size: 9px; margin: 0;">v${APP_VERSION}</p>
             </div>
         </div>
@@ -333,7 +356,7 @@ function showResetPinForm() {
             <div id="resetError" style="color: #FF6B6B; font-size: 12px; margin-top: 8px; display: none;"></div>
             
             <div style="margin-top: 20px; text-align: center;">
-                <p style="color: #B0A8A0; font-size: 10px; margin: 0 0 2px;">© 2025 LORVEN</p>
+                <p style="color: #B0A8A0; font-size: 10px; margin: 0 0 2px;">© ${new Date().getFullYear()} LORVEN</p>
                 <p style="color: #C8C0B8; font-size: 9px; margin: 0;">v${APP_VERSION}</p>
             </div>
         </div>
@@ -355,8 +378,8 @@ function resetPinCode() {
         return;
     }
     
-    settings.pinCode = pin;
-    saveSettings();
+settings.pinCode = String(pin);
+saveSettings();
     lockAttempts = 0;
     showToast(lang === 'en' ? 'PIN reset successfully!' : 'تم تعيين الرمز بنجاح!');
     showLockScreen();
@@ -373,7 +396,9 @@ function toggleLockLanguage() {
 
 function togglePasswordVisibility(inputId, element) {
     const input = document.getElementById(inputId);
+    if (!input) return;
     const icon = element.querySelector('i');
+    if (!icon) return;
     
     if (input.type === 'password') {
         input.type = 'text';
@@ -387,8 +412,8 @@ function togglePasswordVisibility(inputId, element) {
 // ==================== بدء التطبيق ====================
 
 function checkAppLock() {
-    if (settings.appLock === 'on' && settings.pinCode && settings.pinCode.length >= 4) {
-        showLockScreen();
+if (settings.appLock === 'on' && settings.pinCode && String(settings.pinCode).length >= 4) {
+    showLockScreen();
     } else {
         document.querySelector('.app-container').style.display = 'flex';
         if (typeof switchPage === 'function') switchPage('dashboard');

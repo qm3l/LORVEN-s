@@ -2,7 +2,70 @@
 // قاعدة بيانات SQLite - LORVEN SYS v3.0
 
 let DB;
+<<<<<<< HEAD
 
+=======
+var ENCRYPTION_KEY = 'LORVEN_SYS_SECRET_KEY_2026';
+
+
+// ========== IndexedDB Helper ==========
+function openIDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open('LORVEN_DB', 1);
+        request.onupgradeneeded = function(e) {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains('main')) {
+                db.createObjectStore('main');
+            }
+        };
+        request.onsuccess = function(e) { resolve(e.target.result); };
+        request.onerror = function(e) { reject(e); };
+    });
+}
+
+// ========== حفظ واسترجاع إلى IndexedDB ==========
+async function saveToDatabase() {
+    if (!DB) return;
+    try {
+        var data = DB.export();
+        var arr = Array.from(data);
+        var plainText = arr.join(',');
+        var encrypted = CryptoJS.AES.encrypt(plainText, ENCRYPTION_KEY).toString();
+        
+        var idb = await openIDB();
+        var tx = idb.transaction('main', 'readwrite');
+        var store = tx.objectStore('main');
+        store.put(encrypted, 'sqliteData');
+    } catch (e) {
+        console.error('Save error:', e);
+    }
+}
+
+async function loadFromDatabase() {
+    try {
+        var idb = await openIDB();
+        var tx = idb.transaction('main', 'readonly');
+        var store = tx.objectStore('main');
+        var result = await new Promise(function(resolve, reject) {
+            var req = store.get('sqliteData');
+            req.onsuccess = function() { resolve(req.result); };
+            req.onerror = function() { reject(req.error); };
+        });
+        if (result) {
+            var decrypted = CryptoJS.AES.decrypt(result, ENCRYPTION_KEY).toString(CryptoJS.enc.Utf8);
+            var arr = decrypted.split(',').map(Number);
+            var buffer = new Uint8Array(arr);
+            var SQL = await initSqlJs({ locateFile: function(f) { return 'js/lib/' + f; } });
+            DB = new SQL.Database(buffer);
+            return true;
+        }
+        return false;
+    } catch (e) {
+        console.error('Load error:', e);
+        return false;
+    }
+}
+>>>>>>> a423071 (v2.2.0)
 // ========== بدء قاعدة البيانات ==========
 async function initDatabase() {
     if (DB) return DB;
@@ -12,6 +75,7 @@ async function initDatabase() {
             locateFile: file => `js/lib/${file}`
         });
         
+<<<<<<< HEAD
         DB = new SQL.Database();
         
         // إنشاء الجداول
@@ -142,6 +206,33 @@ async function initDatabase() {
         
         // تحميل من localStorage إذا موجود
         loadFromLocalStorage();
+=======
+        // ✅ حاول تحميل قاعدة البيانات القديمة أولاً
+        const loaded = await loadFromDatabase();
+        
+        if (!loaded) {
+            DB = new SQL.Database();
+        }
+        
+        // إنشاء الجداول إذا ما كانت موجودة
+        DB.run(`
+            CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT);
+            CREATE TABLE IF NOT EXISTS invoices (id TEXT PRIMARY KEY, date TEXT, customerName TEXT, customerPhone TEXT, customerId TEXT, items TEXT, subtotal REAL, delivery REAL, total REAL, profit REAL DEFAULT 0, paidAmount REAL DEFAULT 0, remainingAmount REAL DEFAULT 0, paymentStatus TEXT DEFAULT 'unpaid', deliveryStatus TEXT DEFAULT 'not_delivered', shipmentId TEXT, notes TEXT, currency TEXT, whatsappSent INTEGER DEFAULT 0, discountCode TEXT DEFAULT '', discountAmount REAL DEFAULT 0, discountOwnerName TEXT DEFAULT '');
+            CREATE TABLE IF NOT EXISTS customers (id TEXT PRIMARY KEY, name TEXT, phone TEXT, notes TEXT, purchaseCount INTEGER DEFAULT 0, totalSpent REAL DEFAULT 0, totalPaid REAL DEFAULT 0, totalRemaining REAL DEFAULT 0, lastPurchase TEXT, tier TEXT DEFAULT 'normal', totalLoyaltyPoints REAL DEFAULT 0, pendingLoyaltyPoints REAL DEFAULT 0, createdAt TEXT);
+            CREATE TABLE IF NOT EXISTS shipments (id TEXT PRIMARY KEY, status TEXT DEFAULT 'open', orderCount INTEGER DEFAULT 0, maxItems INTEGER DEFAULT 20, supplierName TEXT, expectedArrival TEXT, closedAt TEXT, createdAt TEXT);
+            CREATE TABLE IF NOT EXISTS suppliers (id TEXT PRIMARY KEY, name TEXT, phone TEXT, notes TEXT, totalItems INTEGER DEFAULT 0, createdAt TEXT);
+            CREATE TABLE IF NOT EXISTS bundles (id TEXT PRIMARY KEY, name TEXT, items TEXT, totalPrice REAL DEFAULT 0, salesCount INTEGER DEFAULT 0, createdAt TEXT);
+            CREATE TABLE IF NOT EXISTS wishlist (id TEXT PRIMARY KEY, name TEXT, price REAL DEFAULT 0, category TEXT, addedDate TEXT);
+            CREATE TABLE IF NOT EXISTS notifications (id TEXT PRIMARY KEY, type TEXT, title TEXT, message TEXT, refId TEXT, read INTEGER DEFAULT 0, createdAt TEXT);
+            CREATE TABLE IF NOT EXISTS loyaltyCodes (id TEXT PRIMARY KEY, code TEXT, customerId TEXT, customerName TEXT, tier TEXT, discount REAL DEFAULT 10, minOrder REAL DEFAULT 100, maxUses INTEGER DEFAULT 5, usedCount INTEGER DEFAULT 0, pointsEarned REAL DEFAULT 0, totalPoints REAL DEFAULT 0, usedBy TEXT, createdAt TEXT, expiresAt TEXT, active INTEGER DEFAULT 1);
+            CREATE TABLE IF NOT EXISTS notes (id TEXT PRIMARY KEY, title TEXT, content TEXT, color TEXT DEFAULT '#f5efe8', pinned INTEGER DEFAULT 0, createdAt TEXT, updatedAt TEXT);
+        `);
+        
+        // ✅ احفظ فقط إذا كانت أول مرة
+        if (!loaded) {
+            await saveToDatabase();
+        }
+>>>>>>> a423071 (v2.2.0)
         
         return DB;
     } catch (e) {
@@ -150,6 +241,7 @@ async function initDatabase() {
     }
 }
 
+<<<<<<< HEAD
 // ========== حفظ واسترجاع ==========
 function saveToLocalStorage() {
     if (!DB) return;
@@ -170,6 +262,8 @@ function loadFromLocalStorage() {
     } catch (e) {}
 }
 
+=======
+>>>>>>> a423071 (v2.2.0)
 // ========== دوال التحميل القديمة (متوافقة) ==========
 function loadData() {
     loadSettings();
@@ -188,6 +282,7 @@ function loadData() {
 // ========== إعدادات ==========
 function loadSettings() {
     try {
+<<<<<<< HEAD
         const result = DB.exec("SELECT * FROM settings");
         if (result.length > 0) {
             const rows = result[0].values;
@@ -196,11 +291,31 @@ function loadSettings() {
             });
         }
     } catch (e) {}
+=======
+        var result = DB.exec("SELECT * FROM settings");
+        if (result.length > 0 && result[0].values) {
+            var rows = result[0].values;
+            for (var i = 0; i < rows.length; i++) {
+                var key = rows[i][0];
+                var value = rows[i][1];
+                try {
+                    settings[key] = JSON.parse(value);
+                } catch (e) {
+                    settings[key] = value;
+                }
+            }
+            console.log('✅ Settings loaded:', Object.keys(settings).length, 'keys');
+        }
+    } catch (e) {
+        console.error('Error loading settings:', e);
+    }
+>>>>>>> a423071 (v2.2.0)
 }
 
 function saveSettings() {
     try {
         DB.run("DELETE FROM settings");
+<<<<<<< HEAD
         const stmt = DB.prepare("INSERT INTO settings (key, value) VALUES (?, ?)");
         Object.entries(settings).forEach(([key, value]) => {
             stmt.run([key, typeof value === 'object' ? JSON.stringify(value) : String(value)]);
@@ -208,6 +323,21 @@ function saveSettings() {
         stmt.free();
         saveToLocalStorage();
     } catch (e) {}
+=======
+        var stmt = DB.prepare("INSERT INTO settings (key, value) VALUES (?, ?)");
+        var keys = Object.keys(settings);
+        for (var i = 0; i < keys.length; i++) {
+            var key = keys[i];
+            var value = settings[key];
+            var stringValue = (typeof value === 'object') ? JSON.stringify(value) : String(value);
+            stmt.run([key, stringValue]);
+        }
+        stmt.free();
+        saveToDatabase();
+    } catch (e) {
+        console.error('Error saving settings:', e);
+    }
+>>>>>>> a423071 (v2.2.0)
 }
 
 // ========== فواتير ==========
@@ -428,6 +558,10 @@ function loadNotes() {
     } catch (e) { notes = []; }
 }
 
+<<<<<<< HEAD
+=======
+// في data.js - غيّر saveNotes إلى:
+>>>>>>> a423071 (v2.2.0)
 function saveNotes() {
     try {
         DB.run("DELETE FROM notes");
@@ -438,10 +572,16 @@ function saveNotes() {
                 n.updatedAt || new Date().toISOString()]);
         });
         stmt.free();
+<<<<<<< HEAD
         saveToLocalStorage();
     } catch (e) {}
 }
 
+=======
+        saveToDatabase();
+    } catch (e) {}
+}
+>>>>>>> a423071 (v2.2.0)
 // ========== دوال احتياطية ==========
 function saveAllData() {
     saveSettings();
@@ -470,4 +610,8 @@ function decryptData(str) {
     } catch (e) {
         return JSON.parse(str);
     }
+<<<<<<< HEAD
         }
+=======
+}
+>>>>>>> a423071 (v2.2.0)

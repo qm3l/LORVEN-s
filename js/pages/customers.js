@@ -54,7 +54,7 @@ function renderCustomersList(filter = '') {
     
     if (filtered.length === 0) {
         container.innerHTML = `
-            <div style="text-align: center; padding: 40px; color: var(--text-soft);">
+            <div style="text-align: center; padding-top: 20vh; color: var(--text-soft);">
                 <i class="fas fa-user-slash" style="font-size: 48px; margin-bottom: 12px; opacity: 0.3;"></i>
                 <p>${lang === 'en' ? 'No customers found' : 'لا توجد عميلات'}</p>
             </div>
@@ -183,10 +183,11 @@ function saveCustomer() {
     
     customers.push(customer);
     saveCustomers();
+    confetti();
     
     document.getElementById('customerModal')?.remove();
     renderCustomersList();
-    playSound('save');
+    playSound('success');
 showCheckmark(lang === 'en' ? 'Customer Saved ✓' : 'تم حفظ العميل');    
     addNotification('customer', 
         lang === 'en' ? 'New Customer' : 'عميلة جديدة',
@@ -289,6 +290,7 @@ function deleteCustomer(customerId) {
             document.getElementById('customerModal')?.remove();
             renderCustomersList();
             showToast(t('customerDeleted'));
+            playSound('delete');
         }
     );
 }
@@ -488,7 +490,7 @@ function exportCustomerPDF(customerId) {
                         `).join('')}
                     </div>
                 ` : ''}
-                <div class="footer">© 2025 LORVEN · ${lang === 'en' ? 'Customer Report' : 'تقرير عميلة'}</div>
+                <div class="footer">© ${new Date().getFullYear()} LORVEN · ${lang === 'en' ? 'Customer Report' : 'تقرير عميلة'}</div>
             </div>
         </body></html>
     `);

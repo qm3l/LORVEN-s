@@ -19,28 +19,28 @@ function renderDashboard(container) {
     
     let html = `
         <!-- إحصائيات -->
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 14px;">
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-coins"></i></div>
-                <div class="stat-value">${formatCurrency(salesToday)}</div>
-                <div class="stat-label">${lang === 'en' ? 'Today Sales' : 'مبيعات اليوم'}</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
-                <div class="stat-value">${formatCurrency(profitToday)}</div>
-                <div class="stat-label">${lang === 'en' ? 'Net Profit' : 'صافي الربح'}</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-shopping-bag"></i></div>
-                <div class="stat-value">${ordersToday}</div>
-                <div class="stat-label">${lang === 'en' ? 'Today Orders' : 'طلبات اليوم'}</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-users"></i></div>
-                <div class="stat-value">${customersCount}</div>
-                <div class="stat-label">${lang === 'en' ? 'Customers' : 'عميلة'}</div>
-            </div>
-        </div>
+<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 14px;">
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-coins"></i></div>
+        <div class="stat-value count-up" data-target="${salesToday}">0</div>
+        <div class="stat-label">${lang === 'en' ? 'Today Sales' : 'مبيعات اليوم'}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+        <div class="stat-value count-up" data-target="${profitToday}">0</div>
+        <div class="stat-label">${lang === 'en' ? 'Net Profit' : 'صافي الربح'}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-shopping-bag"></i></div>
+        <div class="stat-value count-up" data-target="${ordersToday}">0</div>
+        <div class="stat-label">${lang === 'en' ? 'Today Orders' : 'طلبات اليوم'}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-users"></i></div>
+        <div class="stat-value count-up" data-target="${customersCount}">0</div>
+        <div class="stat-label">${lang === 'en' ? 'Customers' : 'عميلة'}</div>
+    </div>
+</div>
         
 <!-- اختصارات سريعة -->
 <div style="margin-bottom: 14px;">
@@ -193,6 +193,7 @@ function renderDashboard(container) {
     html += `<div style="height: 90px;"></div>`;
     
     container.innerHTML = html;
+    setTimeout(animateCounters, 100);
 }
 
 console.log('✅ dashboard.js loaded');

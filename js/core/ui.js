@@ -14,7 +14,8 @@ const pages = {
     more: { title: { ar: 'المزيد', en: 'More' }, showBack: true },
     notes: { title: { ar: 'الملاحظات', en: 'Notes' }, showBack: true },
     invoiceHistory: { title: { ar: 'سجل الفواتير', en: 'Invoice History' }, showBack: true },
-    notifications: { title: { ar: 'الإشعارات', en: 'Notifications' }, showBack: true }
+    notifications: { title: { ar: 'الإشعارات', en: 'Notifications' }, showBack: true },
+    debts: { title: { ar: 'الديون', en: 'Debts' }, showBack: true }
 };
 
 let isSwitching = false;
@@ -75,7 +76,13 @@ function updateBottomNav(page) {
 }
 
 function goBack() {
-    switchPage('dashboard');
+    const morePages = ['shipments', 'suppliers', 'bundles', 'notes', 'debts', 'loyalty', 'settings'];
+    
+    if (morePages.includes(currentPage)) {
+        switchPage('more');
+    } else {
+        switchPage('dashboard');
+    }
 }
 
 function toggleMoreMenu() {
@@ -84,6 +91,11 @@ function toggleMoreMenu() {
 
 function renderPage(page) {
     const container = document.getElementById('mainContent');
+    if (container) {
+container.style.opacity = '0';
+container.style.transition = 'opacity 0.15s ease';
+
+    }
     if (!container) return;
     
     container.innerHTML = '';
@@ -144,7 +156,11 @@ case 'bundles':
         container.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--red);">Error: ' + e.message + '</div>';
         console.error('Render error:', e);
     }
+requestAnimationFrame(() => {
+    container.style.opacity = '1';
+});
 }
+
 
 function applySettings() {
     if (settings.darkMode === 'dark') {
@@ -742,4 +758,66 @@ function showCheckmark(message, callback) {
         setTimeout(() => overlay.remove(), 200);
         if (callback) callback();
     }, 1500);
+}
+// ==================== نظام الصوت ====================
+function playSound(type) {
+    if (!window.soundEnabled) return;
+    
+    const sounds = {
+        success: 'sounds/success.wav',
+        click: 'sounds/click.wav',
+        delete: 'sounds/delete.wav',
+        notification: 'sounds/notification.wav'
+    };
+    
+    if (sounds[type]) {
+        try {
+            const audio = new Audio(sounds[type]);
+            audio.volume = 0.4;
+            audio.play().catch(() => {});
+        } catch (e) {}
+    }
+}
+
+function updateSoundIcon() {
+    const icon = document.getElementById('soundIcon');
+    const label = document.getElementById('soundLabel');
+    
+    if (icon) {
+        icon.innerHTML = `<i class="fas ${soundEnabled ? 'fa-volume-up' : 'fa-volume-mute'}"></i>`;
+    }
+    if (label) {
+        const lang = settings.language;
+        label.textContent = soundEnabled ? (lang === 'en' ? 'On' : 'مفعل') : (lang === 'en' ? 'Mute' : 'صامت');
+    }
+}
+
+function animateCounters() {
+    document.querySelectorAll('.count-up').forEach(function(el) {
+        var target = parseFloat(el.getAttribute('data-target')) || 0;
+        var duration = 400;
+        var start = 0;
+        var step = target / (duration / 16);
+        var timer = setInterval(function() {
+            start += step;
+            if (start >= target) { start = target; clearInterval(timer); }
+            el.textContent = Math.floor(start);
+        }, 16);
+    });
+}
+
+function confetti() {
+    var colors = ['#e8919e', '#c8a84e', '#7c5cbf', '#5b8cc9', '#6b9e7a'];
+    for (var i = 0; i < 30; i++) {
+        var conf = document.createElement('div');
+        conf.style.cssText = [
+            'position:fixed; top:-10px; left:' + Math.random() * 100 + '%;',
+            'width:8px; height:8px; background:' + colors[Math.floor(Math.random() * colors.length)],
+            'border-radius:2px; z-index:99999; pointer-events:none;',
+            'animation:confettiFall ' + (1 + Math.random() * 2) + 's linear forwards;',
+            'animation-delay:' + Math.random() * 0.5 + 's'
+        ].join('');
+        document.body.appendChild(conf);
+        setTimeout(function(el) { el.remove(); }, 2500, conf);
+    }
 }

@@ -1,10 +1,20 @@
 // ==================== main.js ====================
 // نقطة البداية - LORVEN SYS v3.0
 
-document.addEventListener('DOMContentLoaded', function() {
-    // تحميل البيانات
-    if (typeof loadData === 'function') {
-        loadData();
+document.addEventListener('DOMContentLoaded', async function() {
+    
+    // ✅ تهيئة البيانات أولاً
+    if (typeof initApp === 'function') {
+        await initApp();
+    }
+    
+    // ✅ فحص القفل قبل أي شي
+    if (typeof checkAppLock === 'function') {
+        checkAppLock();
+        // إذا التطبيق مقفول، ما نكمل
+        if (settings.appLock === 'on' && settings.pinCode && settings.pinCode.length >= 4) {
+            return;
+        }
     }
     
     // تطبيق الإعدادات
@@ -16,22 +26,14 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function() {
         isAppInitialized = true;
         
-        // التحقق من القفل
-        if (typeof checkAppLock === 'function') {
-            checkAppLock();
-        } else {
-            // إذا ما فيه قفل، افتح الرئيسية
-            if (typeof switchPage === 'function') {
-                switchPage('dashboard');
-            }
+        if (typeof switchPage === 'function') {
+            switchPage('dashboard');
         }
         
-        // فحص الإشعارات التلقائية
         if (typeof checkAutoNotifications === 'function') {
             checkAutoNotifications();
         }
         
-        // فحص الإشعارات كل 5 دقائق
         setInterval(function() {
             if (typeof checkAutoNotifications === 'function') {
                 checkAutoNotifications();
@@ -41,16 +43,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 300);
 });
 
-// ========== معالجة الأخطاء العامة ==========
 window.addEventListener('error', function(e) {
     console.error('Global error:', e.error);
 });
 
-// منع السحب للتحديث
 document.addEventListener('touchmove', function(e) {
-    if (e.target.closest('.main-content') && e.target.closest('.main-content').scrollTop <= 0) {
-        // السماح بالسحب للتحديث فقط في الأعلى
-    }
+    if (e.target.closest('.main-content') && e.target.closest('.main-content').scrollTop <= 0) {}
 }, { passive: true });
 
 console.log('✅ main.js loaded - LORVEN v' + APP_VERSION);

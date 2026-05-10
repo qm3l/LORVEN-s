@@ -607,6 +607,7 @@ function saveInvoiceOnly() {
         }
         
         saveInvoices();
+        confetti();
         updateCustomersFromInvoices();
         
         addNotification('invoice', 
@@ -616,7 +617,7 @@ function saveInvoiceOnly() {
         );
         
         resetInvoicePage();
-        playSound('save');
+        playSound('success');
 showCheckmark(lang === 'en' ? 'Invoice Saved ✓' : 'تم حفظ الفاتورة');
 
     } catch (error) {
@@ -1071,6 +1072,7 @@ else if (typeof switchPage === 'function') {
     switchPage('dashboard');
 }
     showToast(t('deleted'));
+    playSound('delete');
     
     if (currentPage === 'invoiceHistory' && typeof renderInvoiceHistoryList === 'function') {
         renderInvoiceHistoryList();
@@ -1105,7 +1107,7 @@ function printInvoicePreview() {
             ${inv.delivery > 0 ? `<p style="font-size: 11px;">${lang === 'en' ? 'Delivery' : 'التوصيل'}: ${formatCurrency(inv.delivery)}</p>` : ''}
             <hr>
             <p style="font-size: 13px; font-weight: 700; text-align: right;">${lang === 'en' ? 'Total' : 'الإجمالي'}: ${formatCurrency(inv.total)}</p>
-            <p style="text-align: center; font-size: 10px; color: #999; margin-top: 20px;">${lang === 'en' ? 'Thank you for choosing LORVEN' : 'شكراً لاختياركِ لورڤين'}</p>
+            <p style="text-align: center; font-size: 10px; color: #999; margin-top: 20px;">${lang === 'en' ? 'Thank you for choosing LORVEN' : 'شكراً لاختياركِ لورفن'}</p>
         </div>
     `;
     
@@ -1208,7 +1210,7 @@ function exportInvoiceAsPDF(invoiceId) {
                 
                 <div class="total-row"><span>${lang === 'en' ? 'Total' : 'الإجمالي'}</span><span>${formatCurrency(inv.total)}</span></div>
                 
-                <div class="footer">${lang === 'en' ? 'Thank you for choosing LORVEN 🤍' : 'شكراً لاختيارك لورفين 🤍'}</div>
+                <div class="footer">${lang === 'en' ? 'Thank you for choosing LORVEN 🤍' : 'شكراً لاختيارك لورفن 🤍'}</div>
             </div>
         </body></html>
     `);
