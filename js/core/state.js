@@ -1,13 +1,10 @@
 // ==================== تعريف المتغيرات العامة (Global Variables) ====================
-// تأكد من تعريف هذه المتغيرات في البداية لتجنب أخطاء ReferenceError
 var APP_VERSION = "1.3.0";
 var isAppInitialized = false;
 var currentPage = 'dashboard';
 var loyaltyCodes = [];
 var soundEnabled = true;
 
-
-// كائنات البيانات الأساسية
 var settings = {
     language: 'ar',
     darkMode: 'auto',
@@ -44,10 +41,8 @@ var settings = {
 ──────────────────
 
   ممتنين لاختيارك لورفن ليكون جزء من جمالك .. 🤍`
-
 };
 
-// المصفوفات المطلوبة للنظام
 var invoices = [];
 var customers = [];
 var shipments = [];
@@ -60,271 +55,152 @@ var notes = [];
 
 // ==================== دوال التهيئة والإعدادات ====================
 
-// تهيئة التطبيق
 async function initApp() {
     if (isAppInitialized) return;
-    
     console.log('⏳ Initializing LORVEN SYS...');
-
-    await initDatabase();  // ✅ أولاً: جهّز DB
-    loadData();            // ✅ ثانياً: حمّل كل البيانات (تتضمن loadSettings)
-    
+    await initDatabase();
+    loadData();
     console.log('اللغة بعد التحميل:', settings.language);
-    
     applyLanguage();
     applyTheme();
-    
     isAppInitialized = true;
     console.log('✅ LORVEN SYS v' + APP_VERSION + ' initialized');
 }
-// تطبيق اللغة
+
 function applyLanguage() {
     let lang = settings.language || 'ar';
-    if (lang === 'auto') {
-        lang = navigator.language.startsWith('ar') ? 'ar' : 'en';
-    }
-    
+    if (lang === 'auto') lang = navigator.language.startsWith('ar') ? 'ar' : 'en';
     document.documentElement.lang = lang;
     document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
-    
-    // تحديث النصوص في الصفحة التي تحمل data-i18n
-document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (window.i18n && window.i18n[lang] && window.i18n[lang][key]) {
-        el.textContent = window.i18n[lang][key];
-    }
-});
-    
-}
-
-// تطبيق الثيم (داكن/فاتح)
-function applyTheme() {
-    let theme = settings.darkMode || 'light';
-    if (theme === 'auto') {
-        theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-    document.body.classList.toggle('dark-mode', theme === 'dark');
-}
-
-// ==================== دوال المساعدة العامة ====================
-
-// نسخ النص للحافظة
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-        const msg = settings.language === 'en' ? 'Copied' : 'تم النسخ';
-        showToast(`✅ ${text} ${msg}`);
-    }).catch(() => {
-        const msg = settings.language === 'en' ? 'Failed' : 'فشل النسخ';
-        showToast(msg, 'error');
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (window.i18n && window.i18n[lang] && window.i18n[lang][key]) {
+            el.textContent = window.i18n[lang][key];
+        }
     });
 }
 
-// عرض إشعار (Toast)
+function applyTheme() {
+    let theme = settings.darkMode || 'light';
+    if (theme === 'auto') theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.body.classList.toggle('dark-mode', theme === 'dark');
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        showToast('✅ ' + text + ' ' + (settings.language === 'en' ? 'Copied' : 'تم النسخ'));
+    }).catch(() => {
+        showToast(settings.language === 'en' ? 'Failed' : 'فشل النسخ', 'error');
+    });
+}
+
 function showToast(message, type = 'info') {
     const existing = document.querySelector('.toast-message');
     if (existing) existing.remove();
-    
     const toast = document.createElement('div');
-    toast.className = `toast-message toast-${type}`;
+    toast.className = 'toast-message toast-' + type;
     toast.textContent = message;
-    
-    // التنسيق الجمالي (Minimalist Luxury)
-    toast.style.cssText = `
-        position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-        background: ${type === 'error' ? '#e74c3c' : '#2c3e50'};
-        color: white; padding: 12px 24px; border-radius: 50px;
-        z-index: 10000; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        font-size: 14px; transition: opacity 0.3s;
-    `;
-    
+    toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:' + (type === 'error' ? '#e74c3c' : '#2c3e50') + ';color:white;padding:12px 24px;border-radius:50px;z-index:10000;box-shadow:0 4px 15px rgba(0,0,0,0.2);font-size:14px;transition:opacity 0.3s';
     document.body.appendChild(toast);
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        setTimeout(() => toast.remove(), 300);
-    }, 2500);
+    setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 2500);
 }
-
-// ==================== إدارة الصفحات ====================
 
 function switchPage(page) {
     currentPage = page;
     const container = document.getElementById('mainContent');
     if (!container) return;
-    
-    // تفريغ المحتوى الحالي
     container.innerHTML = '';
-
-    // منطق التنقل
     const renderers = {
         'dashboard': typeof renderDashboard === 'function' ? renderDashboard : null,
         'customers': typeof renderCustomersPage === 'function' ? renderCustomersPage : null,
         'invoices': typeof renderInvoicesPage === 'function' ? renderInvoicesPage : null,
         'debts': typeof renderDebtsPage === 'function' ? renderDebtsPage : null
     };
-
-    if (renderers[page]) {
-        renderers[page](container);
-    } else {
-        container.innerHTML = `<div style="padding:20px; text-align:center;">${page} - قريباً</div>`;
-    }
-    
-    // تحديث شكل القائمة السفلية
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.toggle('active', item.dataset.page === page);
-    });
-}
-// ==================== دوال إضافية مفقودة ====================
-
-// حساب عدد الإشعارات غير المقروءة
-function getUnreadNotificationsCount() {
-    return notifications.filter(n => !n.read).length;
+    if (renderers[page]) { renderers[page](container); }
+    else { container.innerHTML = '<div style="padding:20px;text-align:center;">' + page + ' - قريباً</div>'; }
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.toggle('active', item.dataset.page === page));
 }
 
-// فتح قفل التطبيق (سيتم استكماله لاحقاً)
+function getUnreadNotificationsCount() { return notifications.filter(n => !n.read).length; }
+
 function checkAppLock() {
-    // مؤقت - سيتم تطويرها لاحقاً
-    if (typeof switchPage === 'function') {
-        switchPage('dashboard');
-    }
+    if (typeof switchPage === 'function') switchPage('dashboard');
 }
 
-// فحص الإشعارات التلقائية
 function checkAutoNotifications() {
     const now = new Date();
-    
-    // فحص الفواتير غير المرسلة
     if (settings.notifyInvoiceNotSent) {
-        const unsentInvoices = invoices.filter(inv => !inv.whatsappSent);
+        const unsent = invoices.filter(inv => !inv.whatsappSent);
         const days = settings.notifyInvoiceNotSentDays || 1;
-        unsentInvoices.forEach(inv => {
-            const invDate = new Date(inv.date);
-            const diffDays = Math.floor((now - invDate) / (1000 * 60 * 60 * 24));
-            if (diffDays >= days) {
-                addNotification('invoice', 
-                    settings.language === 'en' ? 'Invoice not sent' : 'فاتورة غير مرسلة',
-                    `${inv.id} - ${inv.customerName}`,
-                    inv.id
-                );
+        unsent.forEach(inv => {
+            if (Math.floor((now - new Date(inv.date)) / 86400000) >= days) {
+                addNotification('invoice', settings.language === 'en' ? 'Invoice not sent' : 'فاتورة غير مرسلة', inv.id + ' - ' + inv.customerName, inv.id);
             }
         });
     }
-    
-    // فحص الديون
     if (settings.notifyDebtReminder) {
-        const debtInvoices = invoices.filter(inv => inv.remainingAmount > 0);
+        const debts = invoices.filter(inv => inv.remainingAmount > 0);
         const days = settings.notifyDebtReminderDays || 3;
-        debtInvoices.forEach(inv => {
-            const invDate = new Date(inv.date);
-            const diffDays = Math.floor((now - invDate) / (1000 * 60 * 60 * 24));
-            if (diffDays >= days) {
-                addNotification('debt',
-                    settings.language === 'en' ? 'Pending payment' : 'دفع معلق',
-                    `${inv.customerName}: ${formatCurrency(inv.remainingAmount)}`,
-                    inv.id
-                );
+        debts.forEach(inv => {
+            if (Math.floor((now - new Date(inv.date)) / 86400000) >= days) {
+                addNotification('debt', settings.language === 'en' ? 'Pending payment' : 'دفع معلق', inv.customerName + ': ' + formatCurrency(inv.remainingAmount), inv.id);
             }
         });
     }
-    
-    // فحص الشحنات المتأخرة
     if (settings.notifyShipmentDelayed) {
         shipments.forEach(s => {
             const delay = getShipmentDelayDays(s.id);
-            if (delay > 0) {
-                addNotification('shipment',
-                    settings.language === 'en' ? 'Shipment delayed' : 'شحنة متأخرة',
-                    `${s.id} - تأخرت ${delay} يوم`,
-                    s.id
-                );
-            }
+            if (delay > 0) addNotification('shipment', settings.language === 'en' ? 'Shipment delayed' : 'شحنة متأخرة', s.id + ' - تأخرت ' + delay + ' يوم', s.id);
         });
     }
 }
 
-// دالة مساعدة للحصول على أيام التأخير
 function getShipmentDelayDays(shipmentId) {
-    const shipment = shipments.find(s => s.id === shipmentId);
-    if (!shipment || !shipment.expectedArrival || shipment.status === 'delivered') return 0;
-    
-    const now = new Date();
-    const expected = new Date(shipment.expectedArrival);
-    
-    if (now > expected) {
-        return Math.ceil((now - expected) / (1000 * 60 * 60 * 24));
-    }
-    return 0;
+    const s = shipments.find(x => x.id === shipmentId);
+    if (!s || !s.expectedArrival || s.status === 'delivered') return 0;
+    const d = (new Date() - new Date(s.expectedArrival)) / 86400000;
+    return d > 0 ? Math.ceil(d) : 0;
 }
 
-// إضافة إشعار
 function addNotification(type, title, message, refId) {
     notifications.unshift({
         id: Date.now() + '-' + Math.random().toString(36).substr(2, 6),
-        type: type,
-        title: title,
-        message: message,
-        refId: refId,
-        read: false,
-        createdAt: new Date().toISOString()
+        type: type, title: title, message: message, refId: refId,
+        read: false, createdAt: new Date().toISOString()
     });
-    
     if (notifications.length > 100) notifications.pop();
     saveNotifications();
+    if (typeof updateNotificationBadge === 'function') updateNotificationBadge();
     playSound('notification');
     
-    if (typeof updateNotificationBadge === 'function') updateNotificationBadge();
+    fetch('/api/send-notification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: title, body: message, token: settings.fcmToken || '' })
+    }).catch(function() {});
 }
 
-// تحديث شارة الإشعارات
 function updateNotificationBadge() {
-    const unreadCount = getUnreadNotificationsCount();
+    const count = getUnreadNotificationsCount();
     const badge = document.getElementById('notificationBadgeCount');
     if (badge) {
-        if (unreadCount > 0) {
-            badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
-            badge.style.display = 'flex';
-        } else {
-            badge.style.display = 'none';
-        }
+        if (count > 0) { badge.textContent = count > 99 ? '99+' : count; badge.style.display = 'flex'; }
+        else { badge.style.display = 'none'; }
     }
 }
 
-// تصدير نسخة احتياطية
 function exportBackup() {
-    const data = {
-        version: APP_VERSION,
-        exportDate: new Date().toISOString(),
-        settings: settings,
-        invoices: invoices,
-        customers: customers,
-        shipments: shipments,
-        suppliers: suppliers,
-        bundles: bundles,
-        wishlist: wishlist,
-        notes: notes,
-        notifications: notifications,
-        loyaltyCodes: loyaltyCodes
-    };
-    
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `lorven_backup_${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    
-    showToast(t('backupExported'));
+    const data = { version: APP_VERSION, exportDate: new Date().toISOString(), settings, invoices, customers, shipments, suppliers, bundles, wishlist, notes, notifications, loyaltyCodes };
+    const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'lorven_backup_' + new Date().toISOString().slice(0,10) + '.json'; a.click();
 }
 
 function importBackup(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    
+    const file = event.target.files[0]; if (!file) return;
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
             const data = JSON.parse(e.target.result);
-            
             if (data.settings) settings = data.settings;
             if (data.invoices) invoices = data.invoices;
             if (data.customers) customers = data.customers;
@@ -335,309 +211,104 @@ function importBackup(event) {
             if (data.notes) notes = data.notes;
             if (data.notifications) notifications = data.notifications;
             if (data.loyaltyCodes) loyaltyCodes = data.loyaltyCodes;
-            
             saveAllData();
-            
-            showToast(t('backupImported'));
-            if (typeof switchPage === 'function') switchPage('dashboard');
-        } catch (err) {
-            showToast(t('error'));
-        }
+            showToast(settings.language === 'en' ? 'Backup imported' : 'تم استيراد النسخة');
+            switchPage('dashboard');
+        } catch (err) { showToast(settings.language === 'en' ? 'Error' : 'خطأ', 'error'); }
     };
     reader.readAsText(file);
 }
 
-// عرض صفحة الإشعارات
 function renderNotificationsPage(container) {
     const lang = settings.language;
-    const unreadCount = getUnreadNotificationsCount();
-    
-    let html = `
-        <div style="margin-bottom: 12px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                <h3 style="font-size: 18px; font-weight: 700;">
-                    <i class="fas fa-bell"></i> ${lang === 'en' ? 'Notifications' : 'الإشعارات'}
-                    ${unreadCount > 0 ? `<span style="font-size: 12px; color: var(--orange);">(${unreadCount})</span>` : ''}
-                </h3>
-                ${unreadCount > 0 ? `
-                    <button class="btn btn-outline" style="font-size: 11px;" onclick="markAllNotificationsRead()">
-                        ${lang === 'en' ? 'Mark all read' : 'تحديد الكل كمقروء'}
-                    </button>
-                ` : ''}
-            </div>
-        </div>
-    `;
-    
+    const unread = getUnreadNotificationsCount();
+    let html = '<div style="margin-bottom:12px;"><div style="display:flex;align-items:center;justify-content:space-between;"><h3><i class="fas fa-bell"></i> ' + (lang === 'en' ? 'Notifications' : 'الإشعارات') + (unread > 0 ? ' <span style="color:var(--orange);">(' + unread + ')</span>' : '') + '</h3>' + (unread > 0 ? '<button class="btn btn-outline" onclick="markAllNotificationsRead()">' + (lang === 'en' ? 'Mark all read' : 'تحديد الكل كمقروء') + '</button>' : '') + '</div></div>';
     if (notifications.length === 0) {
-        html += `
-            <div style="text-align: center; padding: 40px; color: var(--text-soft);">
-                <i class="fas fa-bell-slash" style="font-size: 48px; margin-bottom: 12px; opacity: 0.3;"></i>
-                <p>${lang === 'en' ? 'No notifications' : 'لا توجد إشعارات'}</p>
-            </div>
-        `;
+        html += '<div style="text-align:center;padding:40px;color:var(--text-soft);"><i class="fas fa-bell-slash" style="font-size:48px;opacity:0.3;margin-bottom:12px;"></i><p>' + (lang === 'en' ? 'No notifications' : 'لا توجد إشعارات') + '</p></div>';
     } else {
-        const sorted = [...notifications].reverse();
-        sorted.forEach(notif => {
-            const icon = notif.type === 'invoice' ? 'fa-receipt' : 
-                        notif.type === 'shipment' ? 'fa-box' : 
-                        notif.type === 'debt' ? 'fa-money-bill' : 'fa-bell';
-            
-            html += `
-                <div class="stat-card" style="margin-bottom: 8px; ${!notif.read ? 'background: var(--hover);' : ''}" 
-                     onclick="openNotification('${notif.refId}', '${notif.type}')">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <i class="fas ${icon}" style="color: var(--accent-1);"></i>
-                        <div style="flex: 1;">
-                            <div style="font-weight: 600; font-size: 12px;">${escapeHTML(notif.title)}</div>
-                            <div style="font-size: 10px; color: var(--text-soft);">${escapeHTML(notif.message)}</div>
-                            <div style="font-size: 9px; color: var(--text-soft); margin-top: 4px;">${getTimeAgo(notif.createdAt)}</div>
-                        </div>
-                        ${!notif.read ? `<div style="width: 8px; height: 8px; border-radius: 50%; background: var(--orange);"></div>` : ''}
-                    </div>
-                </div>
-            `;
+        [...notifications].reverse().forEach(n => {
+            html += '<div class="stat-card" style="margin-bottom:8px;cursor:pointer;" onclick="openNotification(\'' + n.refId + '\',\'' + n.type + '\')"><div style="display:flex;gap:10px;align-items:center;"><i class="fas fa-' + (n.type === 'invoice' ? 'receipt' : n.type === 'shipment' ? 'box' : n.type === 'debt' ? 'money-bill' : 'bell') + '"></i><div style="flex:1;"><div style="font-weight:600;">' + escapeHTML(n.title) + '</div><div style="font-size:10px;color:var(--text-soft);">' + escapeHTML(n.message) + '</div></div>' + (!n.read ? '<div style="width:8px;height:8px;border-radius:50%;background:var(--orange);"></div>' : '') + '</div></div>';
         });
     }
-    
     container.innerHTML = html;
 }
 
-function markAllNotificationsRead() {
-    notifications.forEach(n => n.read = true);
-    saveNotifications();
-    if (typeof updateNotificationBadge === 'function') updateNotificationBadge();
-    if (currentPage === 'notifications' && typeof renderNotificationsPage === 'function') {
-        renderNotificationsPage(document.getElementById('mainContent'));
-    }
-}
-
+function markAllNotificationsRead() { notifications.forEach(n => n.read = true); saveNotifications(); updateNotificationBadge(); }
 function openNotification(refId, type) {
-    const notif = notifications.find(n => n.refId === refId && n.type === type);
-    if (notif) {
-        notif.read = true;
-        saveNotifications();
-        if (typeof updateNotificationBadge === 'function') updateNotificationBadge();
-    }
-    
-    if (type === 'invoice' && typeof viewInvoiceDetails === 'function') {
-        viewInvoiceDetails(refId);
-    } else if (type === 'shipment' && typeof viewShipmentDetails === 'function') {
-        viewShipmentDetails(refId);
-    } else if (type === 'debt' && typeof viewInvoiceDetails === 'function') {
-        viewInvoiceDetails(refId);
-    }
+    const n = notifications.find(x => x.refId === refId && x.type === type);
+    if (n) { n.read = true; saveNotifications(); updateNotificationBadge(); }
+    if (type === 'invoice' && typeof viewInvoiceDetails === 'function') viewInvoiceDetails(refId);
+    else if (type === 'shipment' && typeof viewShipmentDetails === 'function') viewShipmentDetails(refId);
+    else if (type === 'debt' && typeof viewInvoiceDetails === 'function') viewInvoiceDetails(refId);
 }
 
 function showConfirmModal(message, onConfirm) {
-    const lang = settings.language;
-    
-    const modal = document.createElement('div');
-    modal.className = 'modal bottom-sheet';
-    modal.style.display = 'flex';
-    modal.innerHTML = `
-        <div class="modal-content bottom-sheet-content" style="max-width: 360px; text-align: center;">
-            <div class="modal-header">
-                <div class="modal-title">${lang === 'en' ? 'Confirm' : 'تأكيد'}</div>
-                <div class="modal-close" onclick="this.closest('.modal').remove()">&times;</div>
-            </div>
-            <div class="modal-body">
-                <i class="fas fa-exclamation-triangle" style="font-size: 40px; color: var(--orange); margin-bottom: 12px;"></i>
-                <p style="font-size: 15px; font-weight: 600; margin-bottom: 20px;">${message}</p>
-                <div style="display: flex; gap: 8px;">
-                    <button class="btn btn-outline" style="flex: 1; color: var(--red); border-color: var(--red);" onclick="this.closest('.modal').remove(); (${onConfirm.toString()})()">
-                        ${lang === 'en' ? 'Delete' : 'حذف'}
-                    </button>
-                    <button class="btn btn-primary" style="flex: 1;" onclick="this.closest('.modal').remove()">
-                        ${lang === 'en' ? 'Cancel' : 'إلغاء'}
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
+    const modal = document.createElement('div'); modal.className = 'modal bottom-sheet'; modal.style.display = 'flex';
+    modal.innerHTML = '<div class="modal-content bottom-sheet-content" style="max-width:360px;text-align:center;"><div class="modal-header"><div class="modal-title">' + (settings.language === 'en' ? 'Confirm' : 'تأكيد') + '</div><div class="modal-close" onclick="this.closest(\'.modal\').remove()">&times;</div></div><div class="modal-body"><i class="fas fa-exclamation-triangle" style="font-size:40px;color:var(--orange);margin-bottom:12px;"></i><p>' + message + '</p><div style="display:flex;gap:8px;"><button class="btn btn-outline" style="flex:1;color:var(--red);border-color:var(--red);" onclick="this.closest(\'.modal\').remove();(' + onConfirm.toString() + ')()">' + (settings.language === 'en' ? 'Delete' : 'حذف') + '</button><button class="btn btn-primary" style="flex:1;" onclick="this.closest(\'.modal\').remove()">' + (settings.language === 'en' ? 'Cancel' : 'إلغاء') + '</button></div></div></div>';
     document.body.appendChild(modal);
 }
-function formatCurrency(amount) {
-    const lang = settings.language || 'ar';
-    const currency = lang === 'en' ? 'SAR' : 'ر.س';
-    return amount + ' ' + currency;
-}
+
+function formatCurrency(amount) { return amount + ' ' + (settings.language === 'en' ? 'SAR' : 'ر.س'); }
+
 async function pickContact() {
+    if (!('contacts' in navigator)) { showToast(settings.language === 'en' ? 'Not supported' : 'غير مدعوم'); return; }
     try {
-        if (!('contacts' in navigator)) {
-            showToast(settings.language === 'en' ? 'Not supported on this device' : 'غير مدعوم في هذا الجهاز');
-            return;
-        }
-        
-        const props = ['name', 'tel'];
-        const opts = { multiple: false };
-        
-        const contacts = await navigator.contacts.select(props, opts);
-        
+        const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: false });
         if (contacts && contacts.length > 0) {
-            const contact = contacts[0];
-            const name = contact.name || '';
-            let phone = '';
-            
-            if (contact.tel && contact.tel.length > 0) {
-                phone = contact.tel[0];
-            }
-            
-            // تنظيف الرقم
-            phone = phone.replace(/[\s\-\(\)\+]/g, '');
+            let phone = (contacts[0].tel || [''])[0].replace(/[\s\-\(\)\+]/g, '');
             if (phone.startsWith('9660')) phone = phone.substring(4);
             else if (phone.startsWith('966')) phone = phone.substring(3);
             else if (phone.startsWith('0')) phone = phone.substring(1);
-            else if (phone.startsWith('+')) phone = phone.substring(1);
-            
-            // تعبئة الحقول
             const nameInput = document.getElementById('invoiceCustomerName') || document.getElementById('customerName');
             const phoneInput = document.getElementById('invoiceCustomerPhone') || document.getElementById('customerPhone');
-            
-            if (nameInput && name) nameInput.value = name;
-            if (phoneInput && phone) {
-                phoneInput.value = phone;
-                // استدعاء البحث التلقائي إذا موجود
-                if (typeof autoDetectCustomer === 'function') autoDetectCustomer();
-            }
-            
+            if (nameInput) nameInput.value = contacts[0].name || '';
+            if (phoneInput) { phoneInput.value = phone; if (typeof autoDetectCustomer === 'function') autoDetectCustomer(); }
             showToast(settings.language === 'en' ? 'Contact selected' : 'تم اختيار جهة الاتصال');
         }
-    } catch (err) {
-        console.log('Contact picker error:', err);
-    }
+    } catch (err) {}
 }
 
-function addNotification(type, title, message, refId) {
-    notifications.unshift({
-        id: Date.now() + '-' + Math.random().toString(36).substr(2, 6),
-        type: type, title: title, message: message, refId: refId,
-        read: false, createdAt: new Date().toISOString()
-    });
-    
-    if (notifications.length > 100) notifications.pop();
-    saveNotifications();
-    if (typeof updateNotificationBadge === 'function') updateNotificationBadge();
-    
-    // ✅ إرسال Push Notification
-    fetch('/api/send-notification', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-        title: title,
-        body: message,
-        token: settings.fcmToken || ''
-    })
-}).catch(function() {});
+function generateLoyaltyCode(cn) { const n = cn.replace(/\s/g, '').toUpperCase(); return (n[0]||'L') + Math.floor(Math.random()*10) + (n[1]||'V') + Math.floor(Math.random()*10); }
+
+function createLoyaltyCode(cid) {
+    const c = customers.find(x => x.id === cid); if (!c) return null;
+    const code = { id: 'LOY-' + Date.now(), code: generateLoyaltyCode(c.name), customerId: cid, customerName: c.name, tier: c.tier || 'normal', discount: c.tier === 'vip' ? 20 : c.tier === 'gold' ? 15 : c.tier === 'silver' ? 10 : 5, minOrder: c.tier === 'vip' ? 200 : c.tier === 'gold' ? 150 : c.tier === 'silver' ? 120 : 100, maxUses: 5, usedCount: 0, pointsEarned: 0, totalPoints: c.totalLoyaltyPoints || 0, usedBy: [], createdAt: new Date().toISOString(), expiresAt: (() => { const d = new Date(); d.setDate(d.getDate() + 60); return d.toISOString(); })(), active: true };
+    loyaltyCodes.push(code); saveLoyaltyCodes(); return code;
 }
 
-function generateLoyaltyCode(customerName) {
-    const name = customerName.replace(/\s/g, '').toUpperCase();
-    const first = name.charAt(0) || 'L';
-    const second = name.charAt(1) || 'V';
-    const num1 = Math.floor(Math.random() * 10);
-    const num2 = Math.floor(Math.random() * 10);
-    return first + num1 + second + num2;
+function useLoyaltyCode(code, phone) {
+    const lc = loyaltyCodes.find(c => c.code === code && c.active && new Date(c.expiresAt) > new Date() && c.usedCount < c.maxUses);
+    if (!lc) return null;
+    if (customers.find(c => c.id === lc.customerId)?.phone === phone) return { error: 'self' };
+    if (lc.usedBy.includes(phone)) return { error: 'duplicate' };
+    return lc;
 }
 
-function createLoyaltyCode(customerId) {
-    const customer = customers.find(c => c.id === customerId);
-    if (!customer) return null;
-    
-    const code = generateLoyaltyCode(customer.name);
-    
-    const newCode = {
-        id: 'LOY-' + Date.now(),
-        code: code,
-        customerId: customerId,
-        customerName: customer.name,
-        tier: customer.tier || 'normal',
-        discount: customer.tier === 'vip' ? 20 : customer.tier === 'gold' ? 15 : customer.tier === 'silver' ? 10 : 5,
-        minOrder: customer.tier === 'vip' ? 200 : customer.tier === 'gold' ? 150 : customer.tier === 'silver' ? 120 : 100,
-        maxUses: 5,
-        usedCount: 0,
-        pointsEarned: 0,
-        totalPoints: customer.totalLoyaltyPoints || 0,
-        usedBy: [],
-        createdAt: new Date().toISOString(),
-        expiresAt: (() => { const d = new Date(); d.setDate(d.getDate() + 60); return d.toISOString(); })(),
-        active: true
-    };
-    
-    loyaltyCodes.push(newCode);
+function applyLoyaltyCode(code, phone, orderTotal) {
+    const r = useLoyaltyCode(code, phone); if (!r) return null; if (r.error) return r;
+    if (orderTotal < r.minOrder) return { error: 'min_order' };
+    r.usedCount++; r.usedBy.push(phone); r.pointsEarned += r.discount;
+    const c = customers.find(x => x.id === r.customerId);
+    if (c) { c.totalLoyaltyPoints = (c.totalLoyaltyPoints || 0) + r.discount; c.pendingLoyaltyPoints = (c.pendingLoyaltyPoints || 0) + r.discount; saveCustomers(); }
+    if (r.usedCount >= r.maxUses) r.active = false;
     saveLoyaltyCodes();
-    return newCode;
+    return { discount: r.discount, code: code, ownerName: r.customerName };
 }
 
-function useLoyaltyCode(code, newCustomerPhone) {
-    const loyaltyCode = loyaltyCodes.find(c => c.code === code && c.active && new Date(c.expiresAt) > new Date() && c.usedCount < c.maxUses);
-    if (!loyaltyCode) return null;
-    
-    // ما ينفع العميلة تستخدم كودها
-    const owner = customers.find(c => c.id === loyaltyCode.customerId);
-    if (owner && owner.phone === newCustomerPhone) return { error: 'self' };
-    
-    // ما ينفع نفس الرقم يستخدم الكود مرتين
-    if (loyaltyCode.usedBy.includes(newCustomerPhone)) return { error: 'duplicate' };
-    
-    return loyaltyCode;
+function redeemLoyaltyPoints(cid) {
+    const c = customers.find(x => x.id === cid);
+    if (!c || (c.pendingLoyaltyPoints || 0) < 100) return null;
+    c.pendingLoyaltyPoints -= 100; saveCustomers(); return 50;
 }
 
-function applyLoyaltyCode(code, newCustomerPhone, orderTotal) {
-    const result = useLoyaltyCode(code, newCustomerPhone);
-    if (!result) return null;
-    if (result.error) return result;
-    
-    const loyaltyCode = result;
-    if (orderTotal < loyaltyCode.minOrder) return { error: 'min_order' };
-    
-    loyaltyCode.usedCount++;
-    loyaltyCode.usedBy.push(newCustomerPhone);
-    loyaltyCode.pointsEarned += loyaltyCode.discount;
-    
-    const customer = customers.find(c => c.id === loyaltyCode.customerId);
-    if (customer) {
-        customer.totalLoyaltyPoints = (customer.totalLoyaltyPoints || 0) + loyaltyCode.discount;
-        customer.pendingLoyaltyPoints = (customer.pendingLoyaltyPoints || 0) + loyaltyCode.discount;
-        saveCustomers();
-    }
-    
-    if (loyaltyCode.usedCount >= loyaltyCode.maxUses) loyaltyCode.active = false;
-    saveLoyaltyCodes();
-    
-    return {
-        discount: loyaltyCode.discount,
-        code: code,
-        ownerName: loyaltyCode.customerName
-    };
-}
-
-function redeemLoyaltyPoints(customerId) {
-    const customer = customers.find(c => c.id === customerId);
-    if (!customer || (customer.pendingLoyaltyPoints || 0) < 100) return null;
-    
-    const discount = 50;
-    customer.pendingLoyaltyPoints -= 100;
-    saveCustomers();
-    
-    return discount;
-}
-
-function getCurrentYear() {
-    return new Date().getFullYear();
-}
+function getCurrentYear() { return new Date().getFullYear(); }
 
 var lockTimer = null;
-
 function resetLockTimer() {
     if (settings.appLock !== 'on') return;
     if (lockTimer) clearTimeout(lockTimer);
-    lockTimer = setTimeout(function() {
-        if (typeof showLockScreen === 'function') {
-            showLockScreen();
-        }
-    }, 30000);
+    lockTimer = setTimeout(() => { if (typeof showLockScreen === 'function') showLockScreen(); }, 600000);
 }
-
 document.addEventListener('click', resetLockTimer);
 document.addEventListener('keypress', resetLockTimer);
 document.addEventListener('scroll', resetLockTimer);
