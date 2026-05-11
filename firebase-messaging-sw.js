@@ -1,6 +1,4 @@
-<<<<<<< HEAD
-=======
-const CACHE_NAME = 'lorven-v6';
+const CACHE_NAME = 'lorven-v7';
 const urlsToCache = [
     '/',
     '/index.html',
@@ -44,7 +42,6 @@ self.addEventListener('fetch', event => {
   );
 });
 
->>>>>>> a423071 (v2.2.0)
 importScripts('https://www.gstatic.com/firebasejs/12.12.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging-compat.js');
 
@@ -60,17 +57,8 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage(function(payload) {
-<<<<<<< HEAD
-  const notificationTitle = payload.notification.title;
-  const notificationOptions = {
-    body: payload.notification.body,
-    icon: '/icons/icon-192.png'
-  };
-  self.registration.showNotification(notificationTitle, notificationOptions);
-=======
   self.registration.showNotification(payload.notification.title, {
     body: payload.notification.body,
     icon: '/icons/icon-192.png'
   });
->>>>>>> a423071 (v2.2.0)
 });
