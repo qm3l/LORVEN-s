@@ -410,14 +410,14 @@ function togglePasswordVisibility(inputId, element) {
 }
 
 // ==================== بدء التطبيق ====================
-
 function checkAppLock() {
     var app = document.querySelector('.app-container');
-if (!app) return;
-if (settings.appLock === 'on' && settings.pinCode && String(settings.pinCode).length >= 4) {
-    showLockScreen();
+    if (!app) return;
+    
+    if (settings.appLock === 'on' && settings.pinCode && String(settings.pinCode).length >= 4) {
+        showLockScreen();
     } else {
-        document.querySelector('.app-container').style.display = 'flex';
+        app.style.display = 'flex';
         if (typeof switchPage === 'function') switchPage('dashboard');
     }
 }
