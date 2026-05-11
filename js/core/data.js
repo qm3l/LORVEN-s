@@ -293,13 +293,6 @@ function loadSettings() {
 function saveSettings() {
     try {
         DB.run("DELETE FROM settings");
-        const stmt = DB.prepare("INSERT INTO settings (key, value) VALUES (?, ?)");
-        Object.entries(settings).forEach(([key, value]) => {
-            stmt.run([key, typeof value === 'object' ? JSON.stringify(value) : String(value)]);
-        });
-        stmt.free();
-        saveToLocalStorage();
-    } catch (e) {}
         var stmt = DB.prepare("INSERT INTO settings (key, value) VALUES (?, ?)");
         var keys = Object.keys(settings);
         for (var i = 0; i < keys.length; i++) {
@@ -313,7 +306,7 @@ function saveSettings() {
     } catch (e) {
         console.error('Error saving settings:', e);
     }
-}
+    }
 
 // ========== فواتير ==========
 function loadInvoices() {
