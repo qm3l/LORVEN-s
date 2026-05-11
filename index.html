@@ -3,206 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <script src="js/lib/xlsx.full.min.js"></script>
     <title id="dynamicTitle">LORVEN SYS</title>
-   
-<script src="https://www.gstatic.com/firebasejs/12.12.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.12.1/firebase-storage-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging-compat.js"></script>
-
-<script>
-    firebase.initializeApp({
-        apiKey: "AIzaSyCyPz0BM92T6fuiEnPRHUinR0IY1MNOP7s",
-        authDomain: "lorven-sys.firebaseapp.com",
-        projectId: "lorven-sys",
-        storageBucket: "lorven-sys.firebasestorage.app",
-        messagingSenderId: "634746871212",
-        appId: "1:634746871212:web:a64826474f26fe48132e09"
-    });
-</script>
-
-<link rel="icon" type="image/png" href="/img/logo.png">
-
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Icons -->
-    <link rel="stylesheet" href="css/all.min.css">
-
-    <script src="js/lib/crypto-js.min.js"></script>
-
-    <!-- Charts -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    
-    <link rel="stylesheet" href="css/style.css">
-
-    <!-- PWA -->
+    <link rel="icon" type="image/png" href="/img/logo.png">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
     <link rel="manifest" href="manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="LORVEN">
     <meta name="theme-color" content="#121A2B">
-    <link rel="apple-touch-icon" href="icons/icon-192.png">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="js/lib/xlsx.full.min.js"></script>
+    <script src="js/lib/crypto-js.min.js"></script>
     <script src="js/lib/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
-    <div class="app-container">
-        <div id="dynamicHeader" class="page-header"></div>
-        <div id="mainContent" class="main-content"></div>
 
-        <div class="bottom-nav" id="bottomNav">
-            <button class="nav-btn" onclick="switchPage('dashboard')"><i class="fas fa-home"></i><span data-i18n="home">الرئيسية</span></button>
-            <button class="nav-btn" onclick="switchPage('invoices')"><i class="fas fa-receipt"></i><span data-i18n="invoices">الفواتير</span></button>
-            <button class="nav-btn" onclick="switchPage('reports')"><i class="fas fa-chart-pie"></i><span data-i18n="reports">التقارير</span></button>
-            <button class="nav-btn" onclick="switchPage('settings')"><i class="fas fa-cog"></i><span data-i18n="settings">الإعدادات</span></button>
+    <div id="splashScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(145deg,#121A2B,#3A4A66);display:flex;align-items:center;justify-content:center;z-index:99999;transition:opacity 0.5s;">
+        <div style="text-align:center;">
+            <img src="img/logo.png" style="width:300px;height:300px;border-radius:24px;object-fit:cover;animation:logoMove 1s ease-in-out infinite;">
+            <h1 style="color:white;font-size:32px;font-weight:800;letter-spacing:6px;margin-top:16px;font-family:'Cairo',sans-serif;">LORVEN</h1>
         </div>
     </div>
 
-    <div class="toast" id="toast">لورفين 🌸</div>
-        </div>
+    <style>
+        @keyframes logoMove { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+        @keyframes confettiFall { to { top:110vh; transform:rotate(720deg); opacity:0; } }
+    </style>
 
-<div id="splashScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(145deg,#121A2B,#3A4A66);display:flex;align-items:center;justify-content:center;z-index:99999;transition:opacity 0.5s;">
-    <div style="text-align:center;">
-<img src="img/logo.png" style="width:300px;height:300px;border-radius:24px;object-fit:cover;animation:logoMove 1s ease-in-out infinite;">        <h1 style="color:white;font-size:32px;font-weight:800;letter-spacing:6px;margin-top:16px;font-family:'Cairo', sans-serif;">LORVEN</h1>
-    </div>
-</div>
-
-<style>
-@keyframes logoMove {
-    0%,100% { opacity: 1; }
-    50% { opacity: 0.5; }
-}
-</style>
-
-<script>
-setTimeout(function(){
-    var splash = document.getElementById('splashScreen');
-    splash.style.opacity = '0';
-    setTimeout(function(){ splash.remove(); }, 500);
-}, 2000);
-</script>
-    <!-- Service Worker -->
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', async () => {
-    try {
-
-      const reg = await navigator.serviceWorker.register('firebase-messaging-sw.js');
-      console.log('✅ ServiceWorker registered');
-
-
-      if (typeof messaging !== 'undefined') {
-        messaging.useServiceWorker(reg);
-      }
-    } catch (error) {
-      console.log('❌ Registration failed:', error);
-    }
+    <script>
+        setTimeout(function(){
+            var splash = document.getElementById('splashScreen');
+            splash.style.opacity = '0';
+            setTimeout(function(){ splash.remove(); }, 500);
+        }, 2000);
     </script>
-    
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js";
-  });
-}
-</script>
 
-<script type="module">
-  const vapidKey = "BKBWXXjIqX1Wqhozgz7pX2w1-ou-KzK51oJkYcF833wezyvZEFMU4HYr7UQOHLn693jg6QrQvcv7FWhfRPrEdKw"; 
+    <!-- Firebase Compat -->
+    <script src="https://www.gstatic.com/firebasejs/12.12.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging-compat.js"></script>
 
-  async function getTokenNow() {
-    try {
-      const reg = await navigator.serviceWorker.ready;
-      const messaging = firebase.messaging();
-      
-      const currentToken = await messaging.getToken({ 
-        vapidKey: vapidKey,
-        serviceWorkerRegistration: reg 
-      });
+    <script>
+        firebase.initializeApp({
+            apiKey: "AIzaSyCyPz0BM92T6fuiEnPRHUinR0IY1MNOP7s",
+            authDomain: "lorven-sys.firebaseapp.com",
+            projectId: "lorven-sys",
+            storageBucket: "lorven-sys.firebasestorage.app",
+            messagingSenderId: "634746871212",
+            appId: "1:634746871212:web:a64826474f26fe48132e09"
+        });
 
-      if (currentToken) {
-        console.log("✅ SUCCESS! Your Token is:");
-        console.log(currentToken);
-        settings.fcmToken = currentToken;
-        saveSettings();
-      } else {
-        console.log('❌ No token available. Check permissions.');
-      }
-    } catch (err) {
-      console.log('❌ Error getting token:', err);
-    }
-  }
-
-  setTimeout(getTokenNow, 2000); 
-</script>
-
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyCyPz0BM92T6fuiEnPRHUinR0IY1MNOP7s",
-  authDomain: "lorven-sys.firebaseapp.com",
-  projectId: "lorven-sys",
-  storageBucket: "lorven-sys.firebasestorage.app",
-  messagingSenderId: "634746871212",
-  appId: "1:634746871212:web:a64826474f26fe48132e09"
-};
-
-const app = initializeApp(firebaseConfig);
-const messaging = getMessaging(app);
-
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('firebase-messaging-sw.js')
-    .then((registration) => {
-      Notification.requestPermission().then(permission => {
-        if (permission === 'granted') {
-          getToken(messaging, {
-            serviceWorkerRegistration: registration,
-            vapidKey: 'BKBWXXjIqX1Wqhozgz7pX2w1-ou-KzK51oJkYcF833wezyvZEFMU4HYr7UQOHLn693jg6QrQvcv7FWhfRPrEdKw'
-          }).then(token => {
-            console.log('Token:', token);
-            const tokenDiv = document.createElement('div');
-            tokenDiv.style = "position:fixed;bottom:10px;left:10px;background:rgba(0,0,0,0.8);color:white;padding:5px;z-index:9999;font-size:8px;max-width:80%;word-break:break-all;border-radius:4px;";
-            tokenDiv.innerText = `Token: ${token}`;
-            document.body.appendChild(tokenDiv);
-          });
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('firebase-messaging-sw.js').then(function(reg) {
+                console.log('✅ SW registered');
+                Notification.requestPermission().then(function(permission) {
+                    if (permission === 'granted') {
+                        var msg = firebase.messaging();
+                        msg.getToken({ vapidKey: "BKBWXXjIqX1Wqhozgz7pX2w1-ou-KzK51oJkYcF833wezyvZEFMU4HYr7UQOHLn693jg6QrQvcv7FWhfRPrEdKw", serviceWorkerRegistration: reg }).then(function(token) {
+                            if (token) {
+                                console.log('✅ Token:', token);
+                            }
+                        });
+                    }
+                });
+            });
         }
-      });
-    });
-}
 
-onMessage(messaging, (payload) => {
-  new Notification(payload.notification.title, {
-    body: payload.notification.body,
-    icon: '/icons/icon-192.png'
-  });
-});
-</script>
-    
-    <!-- JavaScript Files -->
-<script src="js/lib/sql-wasm.js"></script>
+        firebase.messaging().onMessage(function(payload) {
+            new Notification(payload.notification.title, { body: payload.notification.body, icon: '/icons/icon-192.png' });
+        });
+    </script>
+
+    <!-- App Scripts -->
+    <script src="js/lib/sql-wasm.js"></script>
     <script src="js/core/state.js"></script>
     <script src="js/core/i18n.js"></script>
     <script src="js/core/data.js"></script>
     <script src="js/core/helpers.js"></script>
-
-    <script src="js/jspdf.umd.min.js"></script>
-
     <script src="js/system/auth.js"></script>
     <script src="js/system/biometric.js"></script>
     <script src="js/system/import.js"></script>
     <script src="js/system/backup.js"></script>
     <script src="js/system/clearData.js"></script>
-
     <script src="js/features/bundles.js"></script>
     <script src="js/pages/notes.js"></script>
     <script src="js/features/wishlist.js"></script>
     <script src="js/features/notifications.js"></script>
     <script src="js/features/search.js"></script>
     <script src="js/features/export.js"></script>
-
     <script src="js/pages/dashboard.js"></script>
     <script src="js/pages/customers.js"></script>
     <script src="js/pages/invoices.js"></script>
@@ -214,9 +111,7 @@ onMessage(messaging, (payload) => {
     <script src="js/pages/suppliers.js"></script>
     <script src="js/pages/reports.js"></script>
     <script src="js/pages/settings.js"></script>
-
     <script src="js/core/ui.js"></script>
     <script src="js/main.js"></script>
-
 </body>
 </html>
