@@ -3,6 +3,11 @@
 
 document.addEventListener('DOMContentLoaded', async function() {
     
+    // ✅ انتظر تحميل SQL Wasm أولاً
+    if (typeof window.initSqlJs === 'function') {
+        window.SQL = await window.initSqlJs({ locateFile: function(f) { return 'js/lib/' + f; } });
+    }
+
     // ✅ تهيئة البيانات أولاً
     if (typeof initApp === 'function') {
         await initApp();
