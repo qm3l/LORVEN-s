@@ -1435,9 +1435,6 @@ function handleCSVFile(file) {
     };
     reader.readAsText(file);
 }
-<<<<<<< HEAD
-=======
-
 async function toggleBiometric() {
     if (!settings.biometricEnabled) {
         const registered = await registerBiometric();
@@ -1458,4 +1455,3 @@ async function toggleBiometric() {
     document.querySelectorAll('.modal').forEach(m => m.remove());
     openSecuritySettings();
 }
->>>>>>> a423071 (v2.2.0)
