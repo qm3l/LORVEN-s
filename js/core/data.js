@@ -2,9 +2,6 @@
 // قاعدة بيانات SQLite - LORVEN SYS v3.0
 
 let DB;
-<<<<<<< HEAD
-
-=======
 var ENCRYPTION_KEY = 'LORVEN_SYS_SECRET_KEY_2026';
 
 
@@ -65,7 +62,6 @@ async function loadFromDatabase() {
         return false;
     }
 }
->>>>>>> a423071 (v2.2.0)
 // ========== بدء قاعدة البيانات ==========
 async function initDatabase() {
     if (DB) return DB;
@@ -75,7 +71,6 @@ async function initDatabase() {
             locateFile: file => `js/lib/${file}`
         });
         
-<<<<<<< HEAD
         DB = new SQL.Database();
         
         // إنشاء الجداول
@@ -206,7 +201,6 @@ async function initDatabase() {
         
         // تحميل من localStorage إذا موجود
         loadFromLocalStorage();
-=======
         // ✅ حاول تحميل قاعدة البيانات القديمة أولاً
         const loaded = await loadFromDatabase();
         
@@ -232,7 +226,6 @@ async function initDatabase() {
         if (!loaded) {
             await saveToDatabase();
         }
->>>>>>> a423071 (v2.2.0)
         
         return DB;
     } catch (e) {
@@ -240,8 +233,6 @@ async function initDatabase() {
         return null;
     }
 }
-
-<<<<<<< HEAD
 // ========== حفظ واسترجاع ==========
 function saveToLocalStorage() {
     if (!DB) return;
@@ -262,8 +253,6 @@ function loadFromLocalStorage() {
     } catch (e) {}
 }
 
-=======
->>>>>>> a423071 (v2.2.0)
 // ========== دوال التحميل القديمة (متوافقة) ==========
 function loadData() {
     loadSettings();
@@ -282,7 +271,6 @@ function loadData() {
 // ========== إعدادات ==========
 function loadSettings() {
     try {
-<<<<<<< HEAD
         const result = DB.exec("SELECT * FROM settings");
         if (result.length > 0) {
             const rows = result[0].values;
@@ -291,7 +279,6 @@ function loadSettings() {
             });
         }
     } catch (e) {}
-=======
         var result = DB.exec("SELECT * FROM settings");
         if (result.length > 0 && result[0].values) {
             var rows = result[0].values;
@@ -309,13 +296,11 @@ function loadSettings() {
     } catch (e) {
         console.error('Error loading settings:', e);
     }
->>>>>>> a423071 (v2.2.0)
 }
 
 function saveSettings() {
     try {
         DB.run("DELETE FROM settings");
-<<<<<<< HEAD
         const stmt = DB.prepare("INSERT INTO settings (key, value) VALUES (?, ?)");
         Object.entries(settings).forEach(([key, value]) => {
             stmt.run([key, typeof value === 'object' ? JSON.stringify(value) : String(value)]);
@@ -323,7 +308,6 @@ function saveSettings() {
         stmt.free();
         saveToLocalStorage();
     } catch (e) {}
-=======
         var stmt = DB.prepare("INSERT INTO settings (key, value) VALUES (?, ?)");
         var keys = Object.keys(settings);
         for (var i = 0; i < keys.length; i++) {
@@ -337,7 +321,6 @@ function saveSettings() {
     } catch (e) {
         console.error('Error saving settings:', e);
     }
->>>>>>> a423071 (v2.2.0)
 }
 
 // ========== فواتير ==========
@@ -558,10 +541,6 @@ function loadNotes() {
     } catch (e) { notes = []; }
 }
 
-<<<<<<< HEAD
-=======
-// في data.js - غيّر saveNotes إلى:
->>>>>>> a423071 (v2.2.0)
 function saveNotes() {
     try {
         DB.run("DELETE FROM notes");
@@ -572,16 +551,12 @@ function saveNotes() {
                 n.updatedAt || new Date().toISOString()]);
         });
         stmt.free();
-<<<<<<< HEAD
         saveToLocalStorage();
     } catch (e) {}
 }
-
-=======
         saveToDatabase();
     } catch (e) {}
 }
->>>>>>> a423071 (v2.2.0)
 // ========== دوال احتياطية ==========
 function saveAllData() {
     saveSettings();
@@ -610,8 +585,5 @@ function decryptData(str) {
     } catch (e) {
         return JSON.parse(str);
     }
-<<<<<<< HEAD
         }
-=======
 }
->>>>>>> a423071 (v2.2.0)
