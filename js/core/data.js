@@ -271,14 +271,6 @@ function loadData() {
 // ========== إعدادات ==========
 function loadSettings() {
     try {
-        const result = DB.exec("SELECT * FROM settings");
-        if (result.length > 0) {
-            const rows = result[0].values;
-            rows.forEach(([key, value]) => {
-                try { settings[key] = JSON.parse(value); } catch (e) { settings[key] = value; }
-            });
-        }
-    } catch (e) {}
         var result = DB.exec("SELECT * FROM settings");
         if (result.length > 0 && result[0].values) {
             var rows = result[0].values;
