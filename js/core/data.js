@@ -71,136 +71,6 @@ async function initDatabase() {
             locateFile: file => `js/lib/${file}`
         });
         
-        DB = new SQL.Database();
-        
-        // إنشاء الجداول
-        DB.run(`
-            CREATE TABLE IF NOT EXISTS settings (
-                key TEXT PRIMARY KEY,
-                value TEXT
-            );
-            
-            CREATE TABLE IF NOT EXISTS invoices (
-                id TEXT PRIMARY KEY,
-                date TEXT,
-                customerName TEXT,
-                customerPhone TEXT,
-                customerId TEXT,
-                items TEXT,
-                subtotal REAL,
-                delivery REAL,
-                total REAL,
-                profit REAL DEFAULT 0,
-                paidAmount REAL DEFAULT 0,
-                remainingAmount REAL DEFAULT 0,
-                paymentStatus TEXT DEFAULT 'unpaid',
-                deliveryStatus TEXT DEFAULT 'not_delivered',
-                shipmentId TEXT,
-                notes TEXT,
-                currency TEXT,
-                whatsappSent INTEGER DEFAULT 0,
-                discountCode TEXT DEFAULT '',
-                discountAmount REAL DEFAULT 0,
-                discountOwnerName TEXT DEFAULT ''
-            );
-            
-            CREATE TABLE IF NOT EXISTS customers (
-                id TEXT PRIMARY KEY,
-                name TEXT,
-                phone TEXT,
-                notes TEXT,
-                purchaseCount INTEGER DEFAULT 0,
-                totalSpent REAL DEFAULT 0,
-                totalPaid REAL DEFAULT 0,
-                totalRemaining REAL DEFAULT 0,
-                lastPurchase TEXT,
-                tier TEXT DEFAULT 'normal',
-                totalLoyaltyPoints REAL DEFAULT 0,
-                pendingLoyaltyPoints REAL DEFAULT 0,
-                createdAt TEXT
-            );
-            
-            CREATE TABLE IF NOT EXISTS shipments (
-                id TEXT PRIMARY KEY,
-                status TEXT DEFAULT 'open',
-                orderCount INTEGER DEFAULT 0,
-                maxItems INTEGER DEFAULT 20,
-                supplierName TEXT,
-                expectedArrival TEXT,
-                closedAt TEXT,
-                createdAt TEXT
-            );
-            
-            CREATE TABLE IF NOT EXISTS suppliers (
-                id TEXT PRIMARY KEY,
-                name TEXT,
-                phone TEXT,
-                notes TEXT,
-                totalItems INTEGER DEFAULT 0,
-                createdAt TEXT
-            );
-            
-            CREATE TABLE IF NOT EXISTS bundles (
-                id TEXT PRIMARY KEY,
-                name TEXT,
-                items TEXT,
-                totalPrice REAL DEFAULT 0,
-                salesCount INTEGER DEFAULT 0,
-                createdAt TEXT
-            );
-            
-            CREATE TABLE IF NOT EXISTS wishlist (
-                id TEXT PRIMARY KEY,
-                name TEXT,
-                price REAL DEFAULT 0,
-                category TEXT,
-                addedDate TEXT
-            );
-            
-            CREATE TABLE IF NOT EXISTS notifications (
-                id TEXT PRIMARY KEY,
-                type TEXT,
-                title TEXT,
-                message TEXT,
-                refId TEXT,
-                read INTEGER DEFAULT 0,
-                createdAt TEXT
-            );
-            
-            CREATE TABLE IF NOT EXISTS loyaltyCodes (
-                id TEXT PRIMARY KEY,
-                code TEXT,
-                customerId TEXT,
-                customerName TEXT,
-                tier TEXT,
-                discount REAL DEFAULT 10,
-                minOrder REAL DEFAULT 100,
-                maxUses INTEGER DEFAULT 5,
-                usedCount INTEGER DEFAULT 0,
-                pointsEarned REAL DEFAULT 0,
-                totalPoints REAL DEFAULT 0,
-                usedBy TEXT,
-                createdAt TEXT,
-                expiresAt TEXT,
-                active INTEGER DEFAULT 1
-            );
-            
-            CREATE TABLE IF NOT EXISTS notes (
-                id TEXT PRIMARY KEY,
-                title TEXT,
-                content TEXT,
-                color TEXT DEFAULT '#f5efe8',
-                pinned INTEGER DEFAULT 0,
-                createdAt TEXT,
-                updatedAt TEXT
-            );
-        `);
-        
-        // حفظ على localStorage كنسخة احتياطية
-        saveToLocalStorage();
-        
-        // تحميل من localStorage إذا موجود
-        loadFromLocalStorage();
         // ✅ حاول تحميل قاعدة البيانات القديمة أولاً
         const loaded = await loadFromDatabase();
         
@@ -232,25 +102,6 @@ async function initDatabase() {
         console.error('Database init error:', e);
         return null;
     }
-}
-// ========== حفظ واسترجاع ==========
-function saveToLocalStorage() {
-    if (!DB) return;
-    try {
-        const data = DB.export();
-        const buffer = Array.from(data);
-        localStorage.setItem('lorvenDatabase', JSON.stringify(buffer));
-    } catch (e) {}
-}
-
-function loadFromLocalStorage() {
-    try {
-        const stored = localStorage.getItem('lorvenDatabase');
-        if (stored) {
-            const buffer = new Uint8Array(JSON.parse(stored));
-            DB = new SQL.Database(buffer);
-        }
-    } catch (e) {}
 }
 
 // ========== دوال التحميل القديمة (متوافقة) ==========
@@ -306,7 +157,7 @@ function saveSettings() {
     } catch (e) {
         console.error('Error saving settings:', e);
     }
-    }
+}
 
 // ========== فواتير ==========
 function loadInvoices() {
@@ -337,7 +188,7 @@ function saveInvoices() {
             ]);
         });
         stmt.free();
-        saveToLocalStorage();
+        saveToDatabase();
     } catch (e) {}
 }
 
@@ -364,7 +215,7 @@ function saveCustomers() {
                 c.pendingLoyaltyPoints || 0, c.createdAt || new Date().toISOString()]);
         });
         stmt.free();
-        saveToLocalStorage();
+        saveToDatabase();
     } catch (e) {}
 }
 
@@ -389,7 +240,7 @@ function saveShipments() {
                 s.createdAt || new Date().toISOString()]);
         });
         stmt.free();
-        saveToLocalStorage();
+        saveToDatabase();
     } catch (e) {}
 }
 
@@ -412,7 +263,7 @@ function saveSuppliers() {
                 s.createdAt || new Date().toISOString()]);
         });
         stmt.free();
-        saveToLocalStorage();
+        saveToDatabase();
     } catch (e) {}
 }
 
@@ -436,7 +287,7 @@ function saveBundles() {
                 b.salesCount || 0, b.createdAt || new Date().toISOString()]);
         });
         stmt.free();
-        saveToLocalStorage();
+        saveToDatabase();
     } catch (e) {}
 }
 
@@ -458,7 +309,7 @@ function saveWishlist() {
             stmt.run([w.id, w.name, w.price || 0, w.category || '', w.addedDate || new Date().toISOString()]);
         });
         stmt.free();
-        saveToLocalStorage();
+        saveToDatabase();
     } catch (e) {}
 }
 
@@ -482,7 +333,7 @@ function saveNotifications() {
                 n.createdAt || new Date().toISOString()]);
         });
         stmt.free();
-        saveToLocalStorage();
+        saveToDatabase();
     } catch (e) {}
 }
 
@@ -511,7 +362,7 @@ function saveLoyaltyCodes() {
                 lc.createdAt || new Date().toISOString(), lc.expiresAt || '', lc.active ? 1 : 0]);
         });
         stmt.free();
-        saveToLocalStorage();
+        saveToDatabase();
     } catch (e) {}
 }
 
@@ -536,9 +387,6 @@ function saveNotes() {
                 n.updatedAt || new Date().toISOString()]);
         });
         stmt.free();
-        saveToLocalStorage();
-    } catch (e) {}
-}
         saveToDatabase();
     } catch (e) {}
 }
@@ -570,5 +418,4 @@ function decryptData(str) {
     } catch (e) {
         return JSON.parse(str);
     }
-        }
-}
+            }
