@@ -1,10 +1,6 @@
 // ==================== تعريف المتغيرات العامة (Global Variables) ====================
 // تأكد من تعريف هذه المتغيرات في البداية لتجنب أخطاء ReferenceError
-<<<<<<< HEAD
-var APP_VERSION = "1.1.0";
-=======
-var APP_VERSION = "1.2.0";
->>>>>>> a423071 (v2.2.0)
+var APP_VERSION = "1.3.0";
 var isAppInitialized = false;
 var currentPage = 'dashboard';
 var loyaltyCodes = [];
@@ -19,11 +15,8 @@ var settings = {
     currency: 'ر.س',
     countryCode: '967',
     codeBehavior: 'prepend',
-<<<<<<< HEAD
-=======
     biometricEnabled: false,
     biometricId: '',
->>>>>>> a423071 (v2.2.0)
     whatsappTemplate: `✦ لــــورفــــن ✦
 ──────────────────
 
@@ -73,15 +66,10 @@ async function initApp() {
     
     console.log('⏳ Initializing LORVEN SYS...');
 
-<<<<<<< HEAD
-    await initDatabase();
-    loadData();
-=======
     await initDatabase();  // ✅ أولاً: جهّز DB
     loadData();            // ✅ ثانياً: حمّل كل البيانات (تتضمن loadSettings)
     
     console.log('اللغة بعد التحميل:', settings.language);
->>>>>>> a423071 (v2.2.0)
     
     applyLanguage();
     applyTheme();
@@ -650,13 +638,8 @@ function resetLockTimer() {
     }, 30000);
 }
 
-<<<<<<< HEAD
-// استدعاء أولي عند التحميل
-console.log('✅ State Manager Loaded');
-=======
 document.addEventListener('click', resetLockTimer);
 document.addEventListener('keypress', resetLockTimer);
 document.addEventListener('scroll', resetLockTimer);
 
 console.log('✅ State Manager Loaded');
->>>>>>> a423071 (v2.2.0)
