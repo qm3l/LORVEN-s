@@ -1,0 +1,28 @@
+name: Auto Version Bump
+on:
+  push:
+    branches: [main]
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Bump version
+        run: |
+          CURRENT=$(node -e "console.log(require('./js/core/state.js').match(/APP_VERSION = \"(.*?)\"/)[1])")
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+          MSG="${{ github.event.head_commit.message }}"
+          if echo "$MSG" | grep -q '\[major\]'; then
+            MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0
+          elif echo "$MSG" | grep -q '\[minor\]'; then
+            MINOR=$((MINOR + 1)); PATCH=0
+          else
+            PATCH=$((PATCH + 1))
+          fi
+          NEW="$MAJOR.$MINOR.$PATCH"
+          sed -i "s/APP_VERSION = \".*\"/APP_VERSION = \"$NEW\"/" js/core/state.js
+          cat manifest.json | jq ".version = \"$NEW\"" > tmp.json && mv tmp.json manifest.json
+          git config user.name "Bot"
+          git config user.email "bot@lorven.sys"
+          git add js/core/state.js manifest.json
+          git commit -m "v$NEW" && git push || true
