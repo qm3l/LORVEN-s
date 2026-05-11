@@ -31,13 +31,9 @@
     
     <!-- Icons -->
     <link rel="stylesheet" href="css/all.min.css">
-<<<<<<< HEAD
-    
-=======
 
     <script src="js/lib/crypto-js.min.js"></script>
 
->>>>>>> a423071 (v2.2.0)
     <!-- Charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
@@ -52,13 +48,7 @@
     <meta name="theme-color" content="#121A2B">
     <link rel="apple-touch-icon" href="icons/icon-192.png">
 
-
-    <script src="js/jspdf.umd.min.js"></script>
-
-<<<<<<< HEAD
-=======
     <script src="js/lib/jspdf.umd.min.js"></script>
->>>>>>> a423071 (v2.2.0)
 </head>
 <body>
     <div class="app-container">
@@ -112,13 +102,11 @@ if ('serviceWorker' in navigator) {
     } catch (error) {
       console.log('❌ Registration failed:', error);
     }
-<<<<<<< HEAD
     </script>
     
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js";
-=======
   });
 }
 </script>
@@ -139,7 +127,7 @@ import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/fireb
       if (currentToken) {
         console.log("✅ SUCCESS! Your Token is:");
         console.log(currentToken);
-        settings.fcmToken = token;
+        settings.fcmToken = currentToken;
         saveSettings();
       } else {
         console.log('❌ No token available. Check permissions.');
@@ -152,10 +140,7 @@ import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/fireb
   setTimeout(getTokenNow, 2000); 
 </script>
 
-
-
->>>>>>> a423071 (v2.2.0)
-
+<script>
 const firebaseConfig = {
   apiKey: "AIzaSyCyPz0BM92T6fuiEnPRHUinR0IY1MNOP7s",
   authDomain: "lorven-sys.firebaseapp.com",
