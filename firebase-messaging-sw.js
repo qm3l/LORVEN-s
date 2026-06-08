@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lorven-v7';
+const CACHE_NAME = 'lorven-v8';
 const urlsToCache = [
     '/',
     '/index.html',
@@ -12,14 +12,36 @@ const urlsToCache = [
     '/js/core/ui.js',
     '/js/system/auth.js',
     '/js/system/backup.js',
+    '/js/system/clearData.js',
+    '/js/system/import.js',
+    '/js/system/biometric.js',
     '/js/pages/dashboard.js',
     '/js/pages/customers.js',
     '/js/pages/invoices.js',
+    '/js/pages/debts.js',
+    '/js/pages/shipments.js',
+    '/js/pages/suppliers.js',
     '/js/pages/reports.js',
     '/js/pages/settings.js',
+    '/js/pages/notes.js',
+    '/js/pages/loyalty.js',
+    '/js/pages/invoiceHistory.js',
+    '/js/pages/more.js',
+    '/js/features/bundles.js',
+    '/js/features/wishlist.js',
+    '/js/features/notifications.js',
+    '/js/features/search.js',
+    '/js/features/export.js',
+    '/js/lib/sql-wasm.js',
+    '/js/lib/crypto-js.min.js',
     '/manifest.json',
     '/img/logo.png',
-    '/icons/icon-192.png'
+    '/icons/icon-192.png',
+    '/icons/icon-512.png',
+    '/sounds/success.wav',
+    '/sounds/click.wav',
+    '/sounds/delete.wav',
+    '/sounds/notification.wav'
 ];
 
 self.addEventListener('install', event => {
@@ -33,32 +55,25 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    caches.keys().then(keys => {
+      return Promise.all(
+        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+      );
+    }).then(() => self.clients.claim())
+  );
 });
 
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request))
+    caches.match(event.request).then(cached => {
+      if (cached) return cached;
+      
+      return fetch(event.request).catch(() => {
+        if (event.request.mode === 'navigate') {
+          return caches.match('/index.html');
+        }
+      });
+    })
   );
-});
-
-importScripts('https://www.gstatic.com/firebasejs/12.12.1/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging-compat.js');
-
-firebase.initializeApp({
-  apiKey: "AIzaSyCyPz0BM92T6fuiEnPRHUinR0IY1MNOP7s",
-  authDomain: "lorven-sys.firebaseapp.com",
-  projectId: "lorven-sys",
-  storageBucket: "lorven-sys.firebasestorage.app",
-  messagingSenderId: "634746871212",
-  appId: "1:634746871212:web:a64826474f26fe48132e09"
-});
-
-const messaging = firebase.messaging();
-
-messaging.onBackgroundMessage(function(payload) {
-  self.registration.showNotification(payload.notification.title, {
-    body: payload.notification.body,
-    icon: '/icons/icon-192.png'
-  });
 });
